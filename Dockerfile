@@ -1,7 +1,7 @@
 #
 # Docker file for MessageInABottle S<ID> v1.0
 #
-FROM python:3.8
+FROM python:3.9-slim-buster
 LABEL maintainer="MessageInABottle Squad <ID> API Gateway"
 LABEL version="1.0"
 LABEL description="MessageInABottle Application Squad <ID>"
