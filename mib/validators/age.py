@@ -1,6 +1,42 @@
 import datetime
 from wtforms.validators import ValidationError
 
+# GLOBALS
+SPECIAL_CHARACTERS = '@#$%&*-_/'
+
+
+class PasswordValidator(Exception):
+    def __init__(self):
+        """
+        Password Validation
+        """
+
+        self.message = ""
+
+    def __call__(self, form, field):
+        password = field.data
+        valid = True
+
+        """ TODO: we could remove from yaml and put it here
+            # check length
+        if len(password) < 5 or len(password) > 25:
+            return False"""
+
+        # check if upper cases
+        if not any(el.isupper() for el in password):
+            valid = False
+            self.message = 'at least one upper case!'
+        # check if numbers
+        elif not any(el.isdigit() for el in password):
+            valid = False
+            self.message = 'at least one digit!'
+        # check if special characters
+        elif not any(el in SPECIAL_CHARACTERS for el in password):
+            valid = False
+            self.message = 'at least one special character!'
+
+        if not valid:
+            raise ValidationError(self.message)
 
 class AgeValidator(Exception):
     def __init__(self, min_age=0, max_age=0):

@@ -94,13 +94,13 @@ paths:
                 password:
                   type: string
                   description: the password field for the user
-                phone:
+                location:
                   type: string
-                  description: the phone field for the user
+                  description: the location field for the user
               required:
                 - email
                 - password
-                - phone
+                - location
       responses:
         200:
           description: Renders the update_customer template, to allow the customer to modify its data
@@ -159,12 +159,12 @@ paths:
                 lastname: 
                   type: string
                   description: the lastname field for the user
-                birthdate:
+                date_of_birth:
                   type: string
                   description: the birthday field for the user
-                phone:
+                location:
                   type: string
-                  description: the phone field for the user
+                  description: the locatiom of the user
               required:
                 - email
                 - password

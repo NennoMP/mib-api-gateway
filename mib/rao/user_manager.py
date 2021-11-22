@@ -1,3 +1,4 @@
+from datetime import date
 from mib.auth.user import User
 from mib import app
 from flask_login import (logout_user)

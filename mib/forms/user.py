@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms.fields.html5 import DateField, EmailField, TelField
 from wtforms.validators import DataRequired, Email
 
-from mib.validators.age import AgeValidator
+from mib.validators.age import PasswordValidator, AgeValidator
 
 
 class UserForm(FlaskForm):
@@ -28,7 +28,7 @@ class UserForm(FlaskForm):
 
     password = f.PasswordField(
         'Password',
-        validators=[DataRequired()]
+        validators=[DataRequired(), PasswordValidator()]
     )
 
     date_of_birth = DateField(

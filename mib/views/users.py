@@ -23,6 +23,7 @@ def create_user():
         firstname = form.data['firstname']
         lastname = form.data['lastname']
         date_of_birth = form.data['date_of_birth']
+        date_of_birth = date_of_birth.strftime('%Y-%m-%d')
         location = form.data['location']
         response = UserManager.create_user(
             email,
