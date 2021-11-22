@@ -1,7 +1,7 @@
 #
 # We need a lightway image.
 #
-FROM python:3.6-slim-buster
+FROM python:3.6
 
 # copying the current content
 COPY . /code
