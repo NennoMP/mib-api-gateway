@@ -80,7 +80,7 @@ class UserManager:
     def create_user(cls,
                     email: str, password: str,
                     firstname: str, lastname: str,
-                    birthdate, phone: str):
+                    date_of_birth, location: str):
         try:
             url = "%s/user" % cls.USERS_ENDPOINT
             response = requests.post(url,
@@ -89,8 +89,8 @@ class UserManager:
                                          'password': password,
                                          'firstname': firstname,
                                          'lastname': lastname,
-                                         'birthdate': birthdate,
-                                         'phone': phone
+                                         'date_of_birth': date_of_birth,
+                                         'location': location
                                      },
                                      timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                      )

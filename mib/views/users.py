@@ -17,22 +17,22 @@ def create_user():
     """
     form = UserForm()
 
-    if form.is_submitted():
+    if form.validate_on_submit():
         email = form.data['email']
         password = form.data['password']
         firstname = form.data['firstname']
         lastname = form.data['lastname']
-        birthdate = form.data['birthdate']
-        date = birthdate.strftime('%Y-%m-%d')
-        phone = form.data['phone']
+        date_of_birth = form.data['date_of_birth']
+        location = form.data['location']
         response = UserManager.create_user(
             email,
             password,
             firstname,
             lastname,
-            date,
-            phone
+            date_of_birth,
+            location
         )
+
 
         if response.status_code == 201:
             # in this case the request is ok!
