@@ -1,6 +1,6 @@
 import wtforms as f
 from flask_wtf import FlaskForm
-from wtforms.fields.html5 import DateField, EmailField, TelField
+from wtforms.fields.html5 import DateField, EmailField
 from wtforms.validators import DataRequired, Email
 
 from mib.validators.age import PasswordValidator, AgeValidator
@@ -59,3 +59,16 @@ class UserForm(FlaskForm):
 '''
     display = ['email', 'firstname', 'lastname', 'password',
                'date_of_birth', 'location']
+
+
+class UnregisterForm(FlaskForm):
+    """Form created to allowed the users unregistration from the application.
+    This form requires the user password in order unregistrate the account.
+    """
+
+    password = f.PasswordField(
+        'Password',
+        validators=[DataRequired()]
+    )
+
+    display = ['password']

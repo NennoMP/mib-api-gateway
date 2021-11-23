@@ -168,11 +168,40 @@ paths:
               required:
                 - email
                 - password
-      responses:
-        302:
-          description: Redirects to the correct profile page, depending on the type of the user
-  
+
   /user/{user_id}:
+    delete:
+        tags: [ User ]
+        description: Unregister an user
+        parameters:
+          - name: user_id
+            description: User Unique ID
+            in: path
+            required: true
+            schema:
+              type: integer
+              format: int64
+        requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  description: the inserted password for confirming unregistration
+              required:
+                - password
+        responses:
+        202:
+          description: User unregistered, redirect to the index page
+        401:
+          description: User password does not match
+        default:
+          description: An error occured during the unregistration of the user
+
+  '''/user/{user_id}:
     delete:
         tags: [ User ]
         description: Delete a user by its id
@@ -186,4 +215,4 @@ paths:
               format: int64
         responses:
           302:
-            description: User deleted, it redirects to the index page
+            description: User deleted, it redirects to the index page'''

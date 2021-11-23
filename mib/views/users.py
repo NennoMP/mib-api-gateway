@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, url_for, flash
-from flask_login import (login_user, login_required)
+from flask_login import login_user, login_required, logout_user, current_user
 
-from mib.forms import UserForm
+from mib.forms.user import UserForm, UnregisterForm
 from mib.rao.user_manager import UserManager
 from mib.auth.user import User
 
@@ -56,7 +56,37 @@ def create_user():
     return render_template('create_user.html', form=form)
 
 
-@users.route('/delete_user/<int:id>', methods=['GET', 'POST'])
+@users.route('/unregister_user/', methods=['GET', 'POST'])
+@login_required
+def unregister_user():
+    '''
+        Unregister an user from the application
+
+        Returns:
+            Redirects the user to the homepage, once unregistered (password confirmation requested)
+    '''
+
+    form = UnregisterForm()
+
+    if form.validate_on_submit():
+        password = form.data['password']
+
+        response = UserManager.unregister_user(current_user.id, password)
+        if response.status_code == 202:
+            # response is ok
+            logout_user()
+            return redirect(url_for('home.index'))
+        elif response.status_code == 401:
+            # password does not match
+            flash('Password does not match!')
+            return render_template('unregister.html', form=form)
+        else:
+            flash('Error while unregistering the user!')
+            return render_template('unregister.html', form=form)
+
+    return render_template('unregister.html', form=form)
+
+'''@users.route('/delete_user/<int:id>', methods=['GET', 'POST'])
 @login_required
 def delete_user(id):
     """Deletes the data of the user from the database.
@@ -73,5 +103,5 @@ def delete_user(id):
         flash("Error while deleting the user")
         return redirect(url_for('auth.profile', id=id))
         
-    return redirect(url_for('home.index'))
+    return redirect(url_for('home.index'))'''
 

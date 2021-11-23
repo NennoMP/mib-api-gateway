@@ -5,4 +5,5 @@
 {% endblock %}
 {% block navbar_profile_links %}
 <a class="btn btn-info" href="{{ url_for('auth.logout') }}">Logout</a>
+<a class="btn btn-info" href="{{ url_for('users.unregister_user') }}">Unregister</a>
 {% endblock %}
