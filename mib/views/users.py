@@ -1,5 +1,7 @@
-from flask import Blueprint, redirect, render_template, url_for, flash
-from flask_login import login_user, login_required, logout_user, current_user
+from types import MethodDescriptorType
+from flask import Blueprint, redirect, render_template, url_for, flash, request
+from flask_login import (login_user, login_required, logout_user, current_user)
+#from requests.api import request
 
 from mib.forms.user import UserForm, UnregisterForm
 from mib.rao.user_manager import UserManager
@@ -86,7 +88,16 @@ def unregister_user():
 
     return render_template('unregister.html', form=form)
 
-'''@users.route('/delete_user/<int:id>', methods=['GET', 'POST'])
+
+@users.route('/profile/', methods=['GET'])
+@login_required
+def profile():
+    if request.method == 'GET':
+        _user = UserManager.get_profile_by_id(current_user.id)
+        return render_template('profile.html', user=_user)
+
+
+@users.route('/delete_user/<int:id>', methods=['GET', 'POST'])
 @login_required
 def delete_user(id):
     """Deletes the data of the user from the database.
@@ -103,5 +114,5 @@ def delete_user(id):
         flash("Error while deleting the user")
         return redirect(url_for('auth.profile', id=id))
         
-    return redirect(url_for('home.index'))'''
+    return redirect(url_for('home.index'))
 
