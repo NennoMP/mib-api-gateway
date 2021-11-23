@@ -1,15 +1,15 @@
-import bleach
+#import bleach
 import json
 from flask import Blueprint, redirect, render_template, request, abort
-from flask_login import current_user
+#from flask_login import current_user
 
 #from ..access import Access
-from ..auth import login_required
+#from ..auth import login_required
 #from ..background import notify
-from ..utils import get_argument
+#from ..utils import get_argument
 
 #from monolith.database import User, Message, BlackList, db
-from mib.forms import MessageForm
+#from mib.forms import MessageForm
 
 messages= Blueprint('messages', __name__)
 
