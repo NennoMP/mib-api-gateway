@@ -1,5 +1,7 @@
-from flask import Blueprint, redirect, render_template, url_for, flash
-from flask_login import (login_user, login_required)
+from types import MethodDescriptorType
+from flask import Blueprint, redirect, render_template, url_for, flash, request
+from flask_login import (login_user, login_required, current_user)
+#from requests.api import request
 
 from mib.forms import UserForm
 from mib.rao.user_manager import UserManager
@@ -54,6 +56,14 @@ def create_user():
                 flash('The field %s is incorrect: %s' % (fieldName, errorMessage))
 
     return render_template('create_user.html', form=form)
+
+
+@users.route('/profile/', methods=['GET'])
+@login_required
+def profile():
+    if request.method == 'GET':
+        _user = UserManager.get_profile_by_id(current_user.id)
+        return render_template('profile.html', user=_user)
 
 
 @users.route('/delete_user/<int:id>', methods=['GET', 'POST'])

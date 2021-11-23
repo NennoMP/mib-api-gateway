@@ -34,6 +34,30 @@ class UserManager:
         return user
 
     @classmethod
+    def get_profile_by_id(cls, user_id: int) -> User:
+        """
+        This method contacts the users microservice
+        and retrieves the user object by user id.
+        :param user_id: the user id
+        :return: User obj with id=user_id
+        """
+        try:
+            response = requests.get("%s/profile/%s" % (cls.USERS_ENDPOINT, str(user_id)),
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            if response.status_code == 200:
+                # user is authenticated
+                user = User.build_from_json(json_payload)
+            else:
+                raise RuntimeError(
+                    'Server has sent an unrecognized status code %s' % response.status_code)
+
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return user
+
+    @classmethod
     def get_user_by_email(cls, user_email: str):
         """
         This method contacts the users microservice
