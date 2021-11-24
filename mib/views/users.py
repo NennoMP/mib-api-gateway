@@ -89,13 +89,28 @@ def unregister_user():
     return render_template('unregister.html', form=form)
 
 
-@users.route('/profile/', methods=['GET'])
+@users.route('/profile/', methods=['GET', 'POST'])
 @login_required
 def profile():
     form = UserProfileForm()
 
-    if form.validate_on_submit():
-        email = form.data['email']
+    if request.method == 'POST':
+        
+        action = request.form['action']
+        if action == 'Save':
+            email = form.data['email']
+            firstname = form.data['firstname']
+            lastname = form.data['lastname']
+            location = form.data['location']
+            response = UserManager.update_user(
+                current_user.id,
+                email,
+                firstname,
+                lastname,
+                location
+            )
+
+            
 
     if request.method == 'GET':
         _user = UserManager.get_profile_by_id(current_user.id)

@@ -90,14 +90,14 @@ class UserProfileForm(FlaskForm):
         render_kw={"readonly": True},
         validators=[DataRequired()]
     )
-
+    
     bonus = f.StringField(
         'Bonus',
         render_kw={"readonly": True},
         validators=[DataRequired()]
     )
     display = ['firstname', 'lastname', 'email',
-               'location', 'bonus']
+               'location']
 
 
 
