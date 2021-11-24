@@ -89,12 +89,24 @@ def unregister_user():
     return render_template('unregister.html', form=form)
 
 
-@users.route('/profile/', methods=['GET'])
+@users.route('/profile/', methods=['GET', 'POST'])
 @login_required
 def profile():
+
+    _user = UserManager.get_profile_by_id(current_user.id)
     if request.method == 'GET':
-        _user = UserManager.get_profile_by_id(current_user.id)
         return render_template('profile.html', user=_user)
+    
+    # POST
+    action = request.form['action']
+    if action == 'toggleFilter':
+        response = UserManager.update_language_filter(current_user.id)
+        _user = UserManager.get_profile_by_id(current_user.id)
+        if response.status_code != 202:
+            flash("Error while updating the language filter!")
+
+    return render_template('profile.html')
+
 
 
 @users.route('/delete_user/<int:id>', methods=['GET', 'POST'])

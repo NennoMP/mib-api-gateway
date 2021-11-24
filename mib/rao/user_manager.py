@@ -61,6 +61,23 @@ class UserManager:
         return user
 
     @classmethod
+    def update_language_filter(cls, user_id: int):
+        """
+        This method contacts the users microservice
+        to allow the users to update the language filter
+        :param user_id: the user id
+        :return: language filter updated
+        """
+
+        try:
+            url = "%s/profile/%s" % (cls.USERS_ENDPOINT, str(user_id))
+            response = requests.post(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return response
+
+    @classmethod
     def get_user_by_email(cls, user_email: str):
         """
         This method contacts the users microservice

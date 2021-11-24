@@ -29,6 +29,15 @@
                 <div class="row mt-4">
                     <div class="col-md-12"><label class="labels">Bonus</label><input type="text"  id="bonus" name="bonus"  class="form-control" placeholder="bonus" value="{{ user.bonus}}" readonly></div>
                 </div>
+                <div class="row mt-5">
+                    <form action="" method="POST">
+                        {% if user.has_language_filter %}
+                            <button type="submit" id="action" name="action" value="toggleFilter" class="btn btn-primary">Language Filter: on</button>
+                        {% else %}
+                            <button type="submit" id="action" name="action" value="toggleFilter" class="btn btn-primary">Language Filter: off</button>
+                    {% endif %}
+                    </form>
+                </div>
             </div>
         </div>
        </div>
