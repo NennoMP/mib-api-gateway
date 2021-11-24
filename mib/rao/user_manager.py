@@ -146,7 +146,7 @@ class UserManager:
         return response
 
     @classmethod
-    def update_user(cls, user_id: int, email: str, password: str, phone: str):
+    def update_user(cls, user_id: int, email: str, firstname: str, lastname: str, location: str):
         """
         This method contacts the users microservice
         to allow the users to update their profiles
@@ -164,8 +164,9 @@ class UserManager:
             response = requests.put(url,
                                     json={
                                         'email': email,
-                                        'password': password,
-                                        'phone': phone
+                                        'firstname': firstname,
+                                        'lastname': lastname,
+                                        'location': location
                                     },
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                     )
@@ -173,8 +174,6 @@ class UserManager:
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-
-        raise RuntimeError('Error with searching for the user %s' % user_id)
 
     @classmethod
     def unregister_user(cls, user_id: int, password: str):

@@ -3,7 +3,7 @@ from flask import Blueprint, redirect, render_template, url_for, flash, request
 from flask_login import (login_user, login_required, logout_user, current_user)
 #from requests.api import request
 
-from mib.forms.user import UserForm, UnregisterForm
+from mib.forms.user import UserForm, UnregisterForm, UserProfileForm
 from mib.rao.user_manager import UserManager
 from mib.auth.user import User
 
@@ -92,21 +92,45 @@ def unregister_user():
 @users.route('/profile/', methods=['GET', 'POST'])
 @login_required
 def profile():
+    form = UserProfileForm()
 
     _user = UserManager.get_profile_by_id(current_user.id)
     if request.method == 'GET':
-        return render_template('profile.html', user=_user)
+        form.firstname.data = _user.first_name
+        form.lastname.data = _user.last_name
+        form.email.data = _user.email
+        form.location.data = _user.location
+        form.bonus.data = _user.bonus
+
+        return render_template('profile.html', form=form, user=_user)
     
     # POST
-    action = request.form['action']
-    if action == 'toggleFilter':
-        response = UserManager.update_language_filter(current_user.id)
-        _user = UserManager.get_profile_by_id(current_user.id)
-        if response.status_code != 202:
-            flash("Error while updating the language filter!")
+    if request.method == 'POST':
+        action = request.form['action']
 
-    return render_template('profile.html')
+        if action == 'Save':
+            email = form.data['email']
+            firstname = form.data['firstname']
+            lastname = form.data['lastname']
+            location = form.data['location']
+            response = UserManager.update_user(
+                current_user.id,
+                email,
+                firstname,
+                lastname,
+                location
+            )
+        elif action == 'toggleFilter':
+            response = UserManager.update_language_filter(current_user.id)
+            _user = UserManager.get_profile_by_id(current_user.id)
+            if response.status_code != 202:
+                flash("Error while updating the language filter!")
 
+    return render_template('profile.html', form=form, user=_user)
+
+
+
+        
 
 
 @users.route('/delete_user/<int:id>', methods=['GET', 'POST'])
