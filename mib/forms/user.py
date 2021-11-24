@@ -61,6 +61,46 @@ class UserForm(FlaskForm):
                'date_of_birth', 'location']
 
 
+class UserProfileForm(FlaskForm):
+    """Form created to allow the customers sign up to the application.
+    This form requires all the personal information, in order to create the account.
+    """
+
+    email = EmailField(
+        'Email',
+        render_kw={"readonly": True},
+        validators=[DataRequired(), Email(check_deliverability=True)]
+    )
+
+    firstname = f.StringField(
+        'Firstname',
+        render_kw={"readonly": True},
+        validators=[DataRequired()]
+    )
+
+    lastname = f.StringField(
+        'Lastname',
+        render_kw={"readonly": True},
+        validators=[DataRequired()]
+    )
+
+
+    location = f.StringField(
+        'Location',
+        render_kw={"readonly": True},
+        validators=[DataRequired()]
+    )
+
+    bonus = f.StringField(
+        'Bonus',
+        render_kw={"readonly": True},
+        validators=[DataRequired()]
+    )
+    display = ['firstname', 'lastname', 'email',
+               'location', 'bonus']
+
+
+
 class UnregisterForm(FlaskForm):
     """Form created to allowed the users unregistration from the application.
     This form requires the user password in order unregistrate the account.

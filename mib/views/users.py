@@ -3,7 +3,7 @@ from flask import Blueprint, redirect, render_template, url_for, flash, request
 from flask_login import (login_user, login_required, logout_user, current_user)
 #from requests.api import request
 
-from mib.forms.user import UserForm, UnregisterForm
+from mib.forms.user import UserForm, UnregisterForm, UserProfileForm
 from mib.rao.user_manager import UserManager
 from mib.auth.user import User
 
@@ -92,9 +92,20 @@ def unregister_user():
 @users.route('/profile/', methods=['GET'])
 @login_required
 def profile():
+    form = UserProfileForm()
+
+    if form.validate_on_submit():
+        email = form.data['email']
+
     if request.method == 'GET':
         _user = UserManager.get_profile_by_id(current_user.id)
-        return render_template('profile.html', user=_user)
+        form.firstname.data = _user.first_name
+        form.lastname.data = _user.last_name
+        form.email.data = _user.email
+        form.location.data = _user.location
+        form.bonus.data = _user.bonus
+
+        return render_template('profile.html', form=form, user=_user)
 
 
 @users.route('/delete_user/<int:id>', methods=['GET', 'POST'])
