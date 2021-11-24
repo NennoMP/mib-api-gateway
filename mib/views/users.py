@@ -120,6 +120,16 @@ def profile():
                 lastname,
                 location
             )
+            if response.status_code == 202:
+                # response is ok
+                # login_user(response)
+                flash('Edited profile')
+                return redirect(url_for('users.profile'))
+            elif response.status_code == 404:
+                # not updated
+                flash('Not edited!')
+                return render_template('profile.html', form=form)
+
         elif action == 'toggleFilter':
             response = UserManager.update_language_filter(current_user.id)
             _user = UserManager.get_profile_by_id(current_user.id)

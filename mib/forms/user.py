@@ -97,7 +97,7 @@ class UserProfileForm(FlaskForm):
         validators=[DataRequired()]
     )
     display = ['firstname', 'lastname', 'email',
-               'location']
+               'location', 'bonus']
 
 
 

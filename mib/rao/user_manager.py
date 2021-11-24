@@ -160,8 +160,8 @@ class UserManager:
         :return: User updated
         """
         try:
-            url = "%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id))
-            response = requests.put(url,
+            url = "%s/profile/%s" % (cls.USERS_ENDPOINT, str(user_id))
+            response = requests.post(url,
                                     json={
                                         'email': email,
                                         'firstname': firstname,
