@@ -70,7 +70,7 @@ class UserManager:
         """
 
         try:
-            url = "%s/profile/%s" % (cls.USERS_ENDPOINT, str(user_id))
+            url = "%s/profile/%s/language_filter" % (cls.USERS_ENDPOINT, str(user_id))
             response = requests.post(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
