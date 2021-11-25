@@ -54,7 +54,7 @@ paths:
   
   /user/{id}:
     get:
-      tags: [ Profile ]
+      tags: [ User ]
       summary: Shows the profile page of the customer specified by the id
       parameters:
       - name: id
@@ -68,9 +68,27 @@ paths:
           description: Renders the customer_profile template, filled with the ssn form and the user's reservations
         302:
           description: Redirects to the homepage, in case the user accessing the profile is not its owner
+
+
+  /profile/{id}:
+    get:
+      tags: [ User ]
+      summary: Shows the profile page of the customer specified by the id
+      parameters:
+      - name: id
+        in: path
+        description: Customer's unique identifier
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Renders the customer_profile template
+        404:
+          description: Redirects to the customer profile page with error, in case the user accessing the profile is not its owner
     
-    put:
-      summary: Updates the fields for the customer depending on its id
+    post:
+      summary: Updates the fields for the customer profile depending on its id
       tags:
         - Users
       parameters:
@@ -91,21 +109,25 @@ paths:
                 email:
                   type: string
                   description: the email field for the user
-                password:
+                firstname:
                   type: string
-                  description: the password field for the user
+                  description: the name field for the user
+                lastname:
+                  type: string
+                  description: the lastname field for the user
                 location:
                   type: string
                   description: the location field for the user
               required:
                 - email
-                - password
+                - firstname
+                - lastname
                 - location
       responses:
-        200:
-          description: Renders the update_customer template, to allow the customer to modify its data
         302:
           description: Redirects to the customer profile page
+        
+
   /logout:
     get:
       tags: [ Authentication ]
