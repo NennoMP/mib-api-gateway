@@ -3,6 +3,9 @@ from flask_wtf import FlaskForm
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.validators import DataRequired, Email
 
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed, FileRequired
+
 from mib.validators.age import PasswordValidator, AgeValidator
 
 
@@ -96,9 +99,12 @@ class UserProfileForm(FlaskForm):
         render_kw={"readonly": True},
         validators=[DataRequired()]
     )
-    display = ['firstname', 'lastname', 'email',
-               'location', 'bonus']
 
+    profile_pic = FileField(
+                    validators=[FileRequired(), FileAllowed(['png', 'jpg', 'jpg'], 'Images only!')])
+
+    display = ['firstname', 'lastname', 'email',
+               'location', 'bonus', 'profile_pic']
 
 
 class UnregisterForm(FlaskForm):

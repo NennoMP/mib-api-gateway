@@ -7,6 +7,8 @@ from mib.forms.user import UserForm, UnregisterForm, UserProfileForm
 from mib.rao.user_manager import UserManager
 from mib.auth.user import User
 
+from ..utils import image_to_base64
+
 users = Blueprint('users', __name__)
 
 
@@ -101,6 +103,7 @@ def profile():
         form.email.data = _user.email
         form.location.data = _user.location
         form.bonus.data = _user.bonus
+        form.profile_pic.data = _user.profile_pic
 
         return render_template('profile.html', form=form, user=_user)
     
@@ -108,7 +111,17 @@ def profile():
     if request.method == 'POST':
         action = request.form['action']
 
-        if action == 'Save':
+        # Update profile picture
+        if action == "Upload":
+
+            file = form.profile_pic.data
+            format, file = image_to_base64(file)
+            response = UserManager.update_profile_pic(current_user.id, format, file)
+            if response.status_code == 202:
+                # updated
+                flash('Edited profile picture')
+        # Update profile info
+        elif action == 'Save':
             email = form.data['email']
             firstname = form.data['firstname']
             lastname = form.data['lastname']
@@ -127,7 +140,7 @@ def profile():
             elif response.status_code == 404:
                 # not updated
                 flash('Not edited!')
-
+        # Update language filter
         elif action == 'toggleFilter':
             response = UserManager.update_language_filter(current_user.id)
             flash('Updated language filter')
@@ -135,10 +148,6 @@ def profile():
                 flash("Error while updating the language filter!")
 
     return redirect(url_for('users.profile'))
-
-
-
-        
 
 
 @users.route('/delete_user/<int:id>', methods=['GET', 'POST'])
