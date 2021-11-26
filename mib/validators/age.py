@@ -6,10 +6,9 @@ SPECIAL_CHARACTERS = '@#$%&*-_/'
 
 
 class PasswordValidator(Exception):
+
     def __init__(self):
-        """
-        Password Validation
-        """
+        """Password Validation."""
 
         self.message = ""
 
@@ -38,10 +37,13 @@ class PasswordValidator(Exception):
         if not valid:
             raise ValidationError(self.message)
 
+
 class AgeValidator(Exception):
+
     def __init__(self, min_age=0, max_age=0):
         """
-        Age validation
+        Age validation.
+
         :param min_age: 0 means no limit
         :param max_age: 0 means no limit
         """

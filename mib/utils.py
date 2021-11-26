@@ -1,19 +1,23 @@
-from PIL import Image
-from io import BytesIO
 import base64
 import re
 
+from io import BytesIO
 
-'''
-    Utility function for converting a PIL image
-    to base64
-'''
-def image_to_base64(profile_pic: str):
-    format = re.search("\.(.*?)'", str(profile_pic)).group(1)
+from PIL import Image
 
-    pic = Image.open(profile_pic)
+
+def image_to_base64(image: str):
+    """Utility function for converting a PIL image to base64."""
+
+    # Image format
+    format = re.search("\.(.*?)'", str(image)).group(1)
+
+    # Convert image
+    pic = Image.open(image)
     buffered = BytesIO()
     pic.save(buffered, format="PNG")
+
+    # Clean up result string
     binary = str(base64.b64encode(buffered.getvalue()))
     binary = re.search("'(.*)'", binary).group(1)
 
