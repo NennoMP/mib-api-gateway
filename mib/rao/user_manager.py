@@ -1,12 +1,14 @@
+import requests
+
 from datetime import date
 from requests.exceptions import Timeout
 
-from werkzeug import exceptions
-from mib.auth.user import User
-from mib import app
 from flask_login import (logout_user)
 from flask import abort
-import requests
+from werkzeug import exceptions
+
+from mib import app
+from mib.auth.user import User
 
 
 class UserManager:
@@ -21,6 +23,7 @@ class UserManager:
         :param user_id: the user id
         :return: User obj with id=user_id
         """
+
         try:
             response = requests.get("%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id)),
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
@@ -44,6 +47,7 @@ class UserManager:
         :param user_id: the user id
         :return: User obj with id=user_id
         """
+
         try:
             response = requests.get("%s/profile/%s" % (cls.USERS_ENDPOINT, str(user_id)),
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
@@ -59,6 +63,30 @@ class UserManager:
             return abort(500)
 
         return user
+
+    @classmethod
+    def update_profile_pic(cls, user_id: int, format: str, file):
+        """
+        This method contacts the users microservice
+        to allowed the users to update their profile
+        picture
+        :param user_id: the user id
+        :param file: the new profile picture
+        :return: profile picture updated
+        """
+
+        try:
+            url = "%s/profile/%s/profile_picture" % (cls.USERS_ENDPOINT, str(user_id))
+            response = requests.post(url, 
+                                    json={
+                                        'format': format,
+                                        'file': file
+                                    },
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return response
 
     @classmethod
     def update_language_filter(cls, user_id: int):
@@ -85,6 +113,7 @@ class UserManager:
         :param user_email: the user email
         :return: User obj with email=user_email
         """
+
         try:
             response = requests.get("%s/user_email/%s" % (cls.USERS_ENDPOINT, user_email),
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
@@ -108,12 +137,12 @@ class UserManager:
             url = "%s/user" % cls.USERS_ENDPOINT
             response = requests.post(url,
                                      json={
-                                         'email': email,
-                                         'password': password,
-                                         'firstname': firstname,
-                                         'lastname': lastname,
-                                         'date_of_birth': date_of_birth,
-                                         'location': location
+                                        'email': email,
+                                        'password': password,
+                                        'firstname': firstname,
+                                        'lastname': lastname,
+                                        'date_of_birth': date_of_birth,
+                                        'location': location
                                      },
                                      timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                      )
@@ -180,6 +209,7 @@ class UserManager:
         :param user_id: the user id
         :return: User updated
         """
+        
         try:
             logout_user()
             url = "%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id))
@@ -198,6 +228,7 @@ class UserManager:
         :param password: user password
         :return: None if credentials are not correct, User instance if credentials are correct.
         """
+
         payload = dict(email=email, password=password)
         try:
             print('trying response....')

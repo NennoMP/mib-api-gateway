@@ -5,15 +5,24 @@
 
 {% block content %}
 
+    <style>
+        img {
+        border-radius: 50%;
+        }
+    </style>
+    
     <div class="container rounded bg-white mt-5 mb-5">
     
     <div class="row">
         <div class="col-md-3 border-right">
             <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+            <form action="/profile/" method="POST" enctype="multipart/form-data">
+                <img src="data:image/png;base64, {{user.profile_pic}}" width=150/>
                 <span class="font-weight-bold">{{ user.first_name}}</span>
                 <span class="text-black-50">{{user.email}}</span><span> </span></div>
-                <input type="file" id="file" name="file" class="my_button"/>
-                <button type="submit" name="action" value="Upload" class="my_button">Upload</button>
+                <div class="col-md-6" >{{ form['profile_pic'] }}</div>
+                <button type="submit" name="action" value="Upload" class="btn btn-info">Upload</button>
+            </form>
                
         </div>
     
@@ -22,8 +31,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-right">Profile Settings</h4>
                 </div>
-                <form action="/profile/" method="POST" enctype="multipart/form-data">
-
+                <form action="/profile/" method="POST">
                 <div class="row mt-2">
                     <div class="col-md-6">{{ form_field(form['firstname']) }}</div>
                     <div class="col-md-6">{{ form_field(form['lastname']) }}</div>
@@ -31,18 +39,16 @@
                 <div class="row mt-3">
                     <div class="col-md-12">{{ form_field(form['email']) }}</div>
                     <div class="col-md-12">{{ form_field(form['location']) }}</div>
+                    <div class="col-md-12">{{ form_field(form['bonus']) }}</div>
+                    <div class="col-md-3"><input type="button" id="action" name="action" value="Edit" onclick="toggleEdit()" class="btn btn-info"></div>
+                    <div class="col-md-3"><input type="submit" id="action" name="action" value="Save" class="btn btn-info"> </div>
                 </div>
                 <div class="row mt-4">
-                    <div class="col-md-12">{{ form_field(form['bonus']) }}</div>
-                </div>
-                <div class="row mt-5">
                     {% if user.has_language_filter %}
-                        <button type="submit" id="action" name="action" value="toggleFilter" class="btn btn-primary">Language Filter: on</button>
+                        <div class="col-md-10"><button type="submit" id="action" name="action" value="toggleFilter" class="btn btn-success">Language Filter: on</button></div>
                     {% else %}
-                        <button type="submit" id="action" name="action" value="toggleFilter" class="btn btn-primary">Language Filter: off</button>
+                        <div class="col-md-10"><button type="submit" id="action" name="action" value="toggleFilter" class="btn btn-danger">Language Filter: off</button></div>
                     {% endif %}
-                    <div class="col-md-12"><input type="button" id="action" name="action" value="Edit" onclick="toggleEdit()" class="btn btn-primary"></div>
-                    <div class="col-md-12"><input type="submit" id="action" name="action" value="Save" class="btn btn-primary"> </div>
                 </div>
                 </form>
             </div>

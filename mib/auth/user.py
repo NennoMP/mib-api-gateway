@@ -52,4 +52,5 @@ class User(UserMixin):
         s = 'User Object\n'
         for (key, value) in self.__dict__.items():
             s += "%s=%s\n" % (key, value)
+        
         return s
