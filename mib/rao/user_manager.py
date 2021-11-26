@@ -40,7 +40,7 @@ class UserManager:
     def get_profile_by_id(cls, user_id: int) -> User:
         """
         This method contacts the users microservice
-        and retrieves the user object by user id.
+        and retrieves the user profile by user id.
         :param user_id: the user id
         :return: User obj with id=user_id
         """
@@ -124,28 +124,6 @@ class UserManager:
         return user
 
     @classmethod
-    def get_user_by_phone(cls, user_phone: str) -> User:
-        """
-        This method contacts the users microservice
-        and retrieves the user object by user phone.
-        :param user_phone: the user phone
-        :return: User obj with phone=user_phone
-        """
-        try:
-            response = requests.get("%s/user_phone/%s" % (cls.USERS_ENDPOINT, user_phone),
-                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-            json_payload = response.json()
-            user = None
-
-            if response.status_code == 200:
-                user = User.build_from_json(json_payload)
-
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
-
-        return user
-
-    @classmethod
     def create_user(cls,
                     email: str, password: str,
                     firstname: str, lastname: str,
@@ -174,13 +152,11 @@ class UserManager:
         """
         This method contacts the users microservice
         to allow the users to update their profiles
-        :param phone:
-        :param password:
-        :param email:
+        :param email: the user email
+        :param firstname: the user firstname
+        :param lastname: the user lastname
+        :param location: the user location
         :param user_id: the customer id
-            email: the user email
-            password: the user password
-            phone: the user phone
         :return: User updated
         """
         try:
@@ -194,6 +170,7 @@ class UserManager:
                                     },
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                     )
+                                    
             return response
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):

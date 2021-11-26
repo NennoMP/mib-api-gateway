@@ -94,10 +94,20 @@ def unregister_user():
 @users.route('/profile/', methods=['GET', 'POST'])
 @login_required
 def profile():
+    """This method allows:
+        - display user profile information
+        - update user profile information
+
+    Returns:
+        Redirects the user into his profile page
+    """
+
     form = UserProfileForm()
 
-    _user = UserManager.get_profile_by_id(current_user.id)
+    # retrieve profile user information
+    _user = UserManager.get_profile_by_id(current_user.get_id())
     if request.method == 'GET':
+        # populate user profile form
         form.firstname.data = _user.first_name
         form.lastname.data = _user.last_name
         form.email.data = _user.email
@@ -127,20 +137,24 @@ def profile():
             lastname = form.data['lastname']
             location = form.data['location']
             response = UserManager.update_user(
-                current_user.id,
+                current_user.get_id(),
                 email,
                 firstname,
                 lastname,
                 location
             )
-            if response.status_code == 202:
-                # response is ok
-                # login_user(response)
-                flash('Edited profile')
-            elif response.status_code == 404:
+            json_payload = response.json()
+            if response.status_code == 200:
+                update_user = None
+                update_user = User.build_from_json(json_payload['user'])
+                login_user(update_user)
+                flash(json_payload['message'])
+                return redirect(url_for('users.profile'))
+            elif response.status_code == 409:
                 # not updated
-                flash('Not edited!')
-        # Update language filter
+                flash(json_payload['message'])
+                return redirect(url_for('users.profile'))
+
         elif action == 'toggleFilter':
             response = UserManager.update_language_filter(current_user.id)
             flash('Updated language filter')
