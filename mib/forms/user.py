@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Email
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 
-from mib.validators.age import PasswordValidator, AgeValidator
+from mib.validators.validators import EmailValidator, PasswordValidator, AgeValidator
 
 
 class UserForm(FlaskForm):
@@ -16,7 +16,7 @@ class UserForm(FlaskForm):
 
     email = EmailField(
         'Email',
-        validators=[DataRequired(), Email(check_deliverability=True)]
+        validators=[DataRequired(), EmailValidator(), Email(check_deliverability=True)]
     )
 
     firstname = f.StringField(

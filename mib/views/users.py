@@ -36,15 +36,20 @@ def create_user():
             location
         )
 
+        json_payload = response.json()
         if response.status_code == 201:
             # Success: user created
             user = response.json()
             to_login = User.build_from_json(user["user"])
             login_user(to_login)
             return redirect(url_for('home.index', id=to_login.id))
-        elif response.status_code == 200:
+        elif response.status_code == 403:
             # Failed: user already exists
-            flash('User already exists!')
+            flash(json_payload['message'])
+            return render_template('create_user.html', form=form)
+        elif response.status_code == 409:
+            # Failed: invalid data format
+            flash(json_payload['message'])
             return render_template('create_user.html', form=form)
         else:
             flash('Unexpected response from users microservice!')
@@ -118,7 +123,6 @@ def profile():
 
         # Update profile picture
         if action == "Upload":
-
             file = form.profile_pic.data
             format, file = image_to_base64(file)
             response = UserManager.update_profile_pic(current_user.id, format, file)
@@ -150,7 +154,7 @@ def profile():
                 # Failed: profile info not updated
                 flash(json_payload['message'])
                 return redirect(url_for('users.profile'))
-
+        # Update language filter
         elif action == 'toggleFilter':
             response = UserManager.update_language_filter(current_user.id)
             flash('Updated language filter')
