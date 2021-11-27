@@ -177,8 +177,11 @@ def _users():
         POST: if <action_todo> = <Report>: report the chosen user
               if <action_todo> = <Block>: block the chosen user
     '''
-    users = UserManager.get_users_list()
-    return redirect(url_for('users.profile'))
+    if request.method == 'GET':
+        is_admin = current_user.is_admin
+        users = UserManager.get_users_list()
+        _blocked_users = []
+        action_template = 'Ban' if is_admin else 'Report'
+        
+        return render_template('users.html', users=users, blocked_users=_blocked_users, action=action_template)
 
-
-    
