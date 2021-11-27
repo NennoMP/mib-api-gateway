@@ -162,3 +162,23 @@ def profile():
                 flash("Error while updating the language filter!")
 
     return redirect(url_for('users.profile'))
+
+
+@users.route('/users/', methods=['GET', 'POST'])
+@login_required
+def _users():
+    '''Manage the list of users.
+
+        GET: show the list of users with all possible actions: 
+                ban (if is admin,) or 
+                report an user or
+                block or unblock an user
+
+        POST: if <action_todo> = <Report>: report the chosen user
+              if <action_todo> = <Block>: block the chosen user
+    '''
+    users = UserManager.get_users_list()
+    return redirect(url_for('users.profile'))
+
+
+    

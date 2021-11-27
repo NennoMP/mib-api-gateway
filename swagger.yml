@@ -52,24 +52,6 @@ paths:
         200:
           description: Calls the login method
   
-  /user/{id}:
-    get:
-      tags: [ User ]
-      summary: Shows the profile page of the customer specified by the id
-      parameters:
-      - name: id
-        in: path
-        description: Customer's unique identifier
-        required: true
-        schema:
-          type: integer
-      responses:
-        200:
-          description: Renders the customer_profile template, filled with the ssn form and the user's reservations
-        302:
-          description: Redirects to the homepage, in case the user accessing the profile is not its owner
-
-
   /profile/{id}:
     get:
       tags: [ User ]
@@ -135,6 +117,7 @@ paths:
       responses:
         302:
           description: Redirects to the homepage
+
   /user/:
     get:
       tags: [ User ]
@@ -223,18 +206,11 @@ paths:
         default:
           description: An error occured during the unregistration of the user
 
-  '''/user/{user_id}:
-    delete:
-        tags: [ User ]
-        description: Delete a user by its id
-        parameters:
-          - name: user_id
-            description: User Unique ID
-            in: path
-            required: true
-            schema:
-              type: integer
-              format: int64
-        responses:
-          302:
-            description: User deleted, it redirects to the index page'''
+  /users/:
+    get:
+      tags: [ User ]
+      summary: This method allows to retrieve the users list
+      responses:
+        200:
+          description: Renders the users list template
+  

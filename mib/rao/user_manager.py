@@ -1,3 +1,4 @@
+import json
 import requests
 
 from datetime import date
@@ -253,3 +254,25 @@ class UserManager:
                 'Microservice users returned an invalid status code %s, and message %s'
                 % (response.status_code, json_response['error_message'])
             )
+
+    @classmethod
+    def get_users_list(cls):
+        """
+        This method contacts the users microservice
+        and retrieves the list of user objects.
+        :return: User obj list
+        """
+
+        try:
+            response = requests.get("%s/users/" % (cls.USERS_ENDPOINT),
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+            json_payload = response.json()
+            
+            if response.status_code == 200:
+                users_list = [User.build_from_json(user) for user in json_payload['users_list']]
+
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return users_list
+
