@@ -1,8 +1,40 @@
 import datetime
 from wtforms.validators import ValidationError
 
-# GLOBALS
+# GLOBALS FOR FORM CHECKS
 SPECIAL_CHARACTERS = '@#$%&*-_/'
+ALLOWED_EMAILS = {'@test.com',
+                  '@hotmail.com',
+                  '@hotmail.it',
+                  '@outlook.com',
+                  '@outlook.it',
+                  '@gmail.com',
+                  '@gmail.it',
+                  '@yahoo.com',
+                  '@yahoo.it',
+                  '@studenti.unipi.it',
+                  '@di.unipi.it'
+                  }
+
+
+class EmailValidator(Exception):
+
+    def __init__(self):
+        """Email Validation."""
+
+        self.message = "unrecognized email provider!"
+
+    def __call__(self, form, field):
+        email = field.data
+        valid = False
+
+        for e in ALLOWED_EMAILS:
+            if str(email).endswith(e):
+                self.message = ""
+                valid = True
+
+        if not valid:
+            raise ValidationError(self.message)
 
 
 class PasswordValidator(Exception):
@@ -16,23 +48,18 @@ class PasswordValidator(Exception):
         password = field.data
         valid = True
 
-        """ TODO: we could remove from yaml and put it here
-            # check length
-        if len(password) < 5 or len(password) > 25:
-            return False"""
-
-        # check if upper cases
+        # Check if upper cases
         if not any(el.isupper() for el in password):
             valid = False
             self.message = 'at least one upper case!'
-        # check if numbers
-        elif not any(el.isdigit() for el in password):
+        # Check if numbers
+        if not any(el.isdigit() for el in password):
             valid = False
             self.message = 'at least one digit!'
-        # check if special characters
-        elif not any(el in SPECIAL_CHARACTERS for el in password):
+        # Check if special characters
+        if not any(el in SPECIAL_CHARACTERS for el in password):
             valid = False
-            self.message = 'at least one special character!'
+            self.message = 'at least one special character: [@#$%&*-_/]!'
 
         if not valid:
             raise ValidationError(self.message)
