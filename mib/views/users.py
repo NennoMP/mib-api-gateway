@@ -158,28 +158,3 @@ def profile():
                 flash("Error while updating the language filter!")
 
     return redirect(url_for('users.profile'))
-<<<<<<< HEAD
-=======
-
-
-@users.route('/delete_user/<int:id>', methods=['GET', 'POST'])
-@login_required
-def delete_user(id):
-    """Deletes the data of the user from the database.
-
-    Args:
-        id_ (int): takes the unique id as a parameter
-
-    Returns:
-        Redirects the view to the home page
-    """
-
-    response = UserManager.delete_user(id)
-    if response.status_code != 202:
-        # Successfull: user deleted
-        flash("Error while deleting the user")
-        return redirect(url_for('auth.profile', id=id))
-        
-    return redirect(url_for('home.index'))
-
->>>>>>> 8212a2cf34bc66344f28f83dc67a61356e800cc3
