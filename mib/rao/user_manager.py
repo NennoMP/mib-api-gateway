@@ -295,7 +295,7 @@ class UserManager:
         return response
 
     @classmethod
-    def unreport_user(cls, user_email: str):
+    def unreport_user(cls, dest_user_email: str, src_user_id: int):
         """
         This method contacts the users microservice
         and reject a report of a specific user
@@ -303,10 +303,13 @@ class UserManager:
         :return: User unreported
         """
 
+        payload = dict(src_user_id=src_user_id)
         try:
             url = "%s/users/%s/unreport_user" % (cls.USERS_ENDPOINT,
-                                            user_email)
-            response = requests.post(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+                                            dest_user_email)
+            response = requests.post(url,
+                                    json=payload,
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 
@@ -335,18 +338,22 @@ class UserManager:
         return response
 
     @classmethod
-    def update_ban_user(cls, user_id: int):
+    def update_ban_user(cls, dest_user_email: str, src_user_id: int):
         """
         This method contacts the users microservice
         and (un)bans an user.
-        :param user_id: id of the to (un)ban
+        :param dest_user_email: email of the user being (un)banned
+        :param src_user_id: id of the admin (un)banning
         :return: User (un)banned
         """
 
+        payload = dict(src_user_id=src_user_id)
         try:
             url = "%s/users/%s/update_ban_user" % (cls.USERS_ENDPOINT,
-                                                str(user_id))
-            response = requests.post(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+                                                dest_user_email)
+            response = requests.post(url,
+                                    json=payload,
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 

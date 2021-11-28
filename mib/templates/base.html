@@ -16,8 +16,12 @@
 <body>
 
 {% block navbar %}
-     {% if current_user.is_authenticated %}
-        {% include "components/navbar/user_navbar.html" %}
+    {% if current_user.is_authenticated %}
+        {% if current_user.is_admin %}
+            {% include "components/navbar/admin_navbar.html" %}
+        {% else %}
+            {% include "components/navbar/user_navbar.html" %}
+        {% endif %}
     {% else %}
         {% include "components/navbar/anonymous_navbar.html" %}
     {% endif %}

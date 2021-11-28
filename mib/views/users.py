@@ -11,27 +11,22 @@ from ..utils import image_to_base64
 users = Blueprint('users', __name__)
 
 
-def moderate_action(email: str, action: str):
-    '''
+def moderate_action(dest_user_email: str, action: str):
+    """
     Utility function used to apply an action to a User object; the possible actions are Ban, Unban, Report, Reject (a report request)
-    '''
-    """u = db.session.query(User).filter(User.email == email)
-    _user = u.first()
-
-    # if user doesn't exist in the db, raises an error
-    if _user is None:
-        raise RuntimeError('Reported user not found in DB, this should not happen!')
     """
 
     # ban & unban
     if action == 'Ban' or action == "Unban":
-        response = UserManager.update_ban_user(email)
+        src_user_id = current_user.id
+        response = UserManager.update_ban_user(dest_user_email, src_user_id)
     # reject
     elif action == 'Reject':
-        response = UserManager.unreport_user(email)
+        src_user_id = current_user.id
+        response = UserManager.unreport_user(dest_user_email, src_user_id)
     # report
     elif action == 'Report':
-        response = UserManager.report_user(email)
+        response = UserManager.report_user(dest_user_email)
 
     return response
 
@@ -257,14 +252,12 @@ def reported_users():
 
         reported_users = []
         for u in users:
-            print(u.email, u.is_reported, u.is_admin)
             if u.is_reported:
                 reported_users.append(u)
-        print(reported_users)
 
         return render_template('reported_users.html', reported_users=reported_users)
 
-    """# POST
+    # POST
     # Retrieve action and target user email
     elif request.method == 'POST':
         action_todo = request.form['action']
@@ -274,8 +267,8 @@ def reported_users():
         json_payload = response.json()
         if response.status_code == 202:
             # Successfull: reported
-            flash(json_payload(['message']))
+            flash(json_payload['message'])
             return redirect(url_for('users.reported_users'))
         else:
             flash('Error while reporting the user')
-            return redirect(url_for('users.reported_users'))"""
+            return redirect(url_for('users.reported_users'))
