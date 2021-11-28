@@ -243,12 +243,12 @@ class UserManager:
             # We can't connect to Users MS
             return abort(500)
 
-        if response.status_code == 401:
-            # user is not authenticated
-            return None
+        if response.status_code == 401 or response.status_code == 403:
+            # User is not authenticated or has been banned
+            return None, json_response['message']
         elif response.status_code == 200:
             user = User.build_from_json(json_response['user'])
-            return user
+            return user, ''
         else:
             raise RuntimeError(
                 'Microservice users returned an invalid status code %s, and message %s'
@@ -275,4 +275,80 @@ class UserManager:
             return abort(500)
 
         return users_list
+
+    @classmethod
+    def report_user(cls, user_email: str):
+        """
+        This method contacts the users microservice
+        and reports a specific user
+        :param user_email: email of the user to report
+        :return: User reported
+        """
+
+        try:
+            url = "%s/users/%s/report_user" % (cls.USERS_ENDPOINT,
+                                            user_email)
+            response = requests.post(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return response
+
+    @classmethod
+    def unreport_user(cls, user_email: str):
+        """
+        This method contacts the users microservice
+        and reject a report of a specific user
+        :param user_email: email of the user to unreport
+        :return: User unreported
+        """
+
+        try:
+            url = "%s/users/%s/unreport_user" % (cls.USERS_ENDPOINT,
+                                            user_email)
+            response = requests.post(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return response
+
+    @classmethod
+    def update_block_user(cls, dest_user_id: int, src_user_id: int):
+        """
+        This method contacts the users microservice
+        and (un)blocks an user for the source user
+        :param src_user_id: id of the user (un)blocking
+        :param dest_user_id: id of the user being (un)blocked
+        :return: User (un)blocked
+        """
+
+        payload = dict(src_user_id=src_user_id)
+        try:
+            url = "%s/users/%s/update_block_user" % (cls.USERS_ENDPOINT,
+                                                str(dest_user_id))
+            response = requests.post(url,
+                                    json=payload,
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return response
+
+    @classmethod
+    def update_ban_user(cls, user_id: int):
+        """
+        This method contacts the users microservice
+        and (un)bans an user.
+        :param user_id: id of the to (un)ban
+        :return: User (un)banned
+        """
+
+        try:
+            url = "%s/users/%s/update_ban_user" % (cls.USERS_ENDPOINT,
+                                                str(user_id))
+            response = requests.post(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return response
 

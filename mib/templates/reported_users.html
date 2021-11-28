@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %} Reported Users {% endblock %}
+
+{% block content %}
+<ul style="width:20%; float:left;">
+    <h1>Reported Users</h1>
+    {% for user in reported_users: %}
+      {% if user.is_reported and not user.is_banned %} 
+      <li>
+        {{user.id}} {{user.firstname}} {{user.lastname}} {{user.email}} ({{user.email}})
+        <form action="/reported_users/" method="POST">
+          <button type="submit" name="action" value="Reject" class="my_button">Reject</button>
+          <button type="submit" name="action" value="Ban" class="my_button">Ban</button>
+          <input type="hidden" id="email" name="email" value="{{ user.email }}">
+        </form>
+      </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
