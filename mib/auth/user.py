@@ -11,6 +11,8 @@ class User(UserMixin):
     email = None
     is_active = None
     is_admin = None
+    is_reported = None
+    is_banned = None
     authenticated = None
     is_anonymous = False
     extra_data = None
@@ -18,7 +20,7 @@ class User(UserMixin):
     @staticmethod
     def build_from_json(json: dict):
         kw = {key: json[key] for key in ['id', 'email',
-                                         'is_active', 'is_admin', 'authenticated', 'is_anonymous']}
+                                         'is_active', 'is_admin','is_reported', 'is_banned', 'authenticated', 'is_anonymous']}
         extra = json.copy()
         all(map(extra.pop, kw))
         kw['extra'] = extra
@@ -34,6 +36,8 @@ class User(UserMixin):
         self.authenticated = kw["authenticated"]
         self.is_anonymous = kw["is_anonymous"]
         self.is_admin = kw["is_admin"]
+        self.is_reported = kw["is_reported"]
+        self.is_banned = kw["is_banned"]
 
         self.extra_data = kw['extra']
 

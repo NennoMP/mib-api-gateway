@@ -3,7 +3,10 @@ from wtforms.validators import ValidationError
 
 # GLOBALS FOR FORM CHECKS
 SPECIAL_CHARACTERS = '@#$%&*-_/'
-ALLOWED_EMAILS = {'@test.com',
+ALLOWED_EMAILS = {'@example.com',
+                  '@example.it'
+                  '@test.com',
+                  '@test.it',
                   '@hotmail.com',
                   '@hotmail.it',
                   '@outlook.com',
@@ -14,7 +17,7 @@ ALLOWED_EMAILS = {'@test.com',
                   '@yahoo.it',
                   '@studenti.unipi.it',
                   '@di.unipi.it'
-                  }
+}
 
 
 class EmailValidator(Exception):

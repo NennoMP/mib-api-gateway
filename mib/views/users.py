@@ -5,10 +5,47 @@ from flask_login import (login_user, login_required, logout_user, current_user)
 from mib.forms.user import UserForm, UnregisterForm, UserProfileForm
 from mib.rao.user_manager import UserManager
 from mib.auth.user import User
+from mib.decorators import admin_required
 from ..utils import image_to_base64
 
 users = Blueprint('users', __name__)
 
+
+def moderate_action(email: str, action: str):
+    '''
+    Utility function used to apply an action to a User object; the possible actions are Ban, Unban, Report, Reject (a report request)
+    '''
+    """u = db.session.query(User).filter(User.email == email)
+    _user = u.first()
+
+    # if user doesn't exist in the db, raises an error
+    if _user is None:
+        raise RuntimeError('Reported user not found in DB, this should not happen!')
+    """
+
+    # ban & unban
+    if action == 'Ban' or action == "Unban":
+        response = UserManager.update_ban_user(email)
+    # reject
+    elif action == 'Reject':
+        response = UserManager.unreport_user(email)
+    # report
+    elif action == 'Report':
+        response = UserManager.report_user(email)
+
+    return response
+
+    """# block
+    elif action == 'Block':
+        entry = BlackList()
+        entry.id_user = current_user.id
+        entry.id_blocked = _user.id
+        db.session.add(entry)
+        db.session.commit()
+    # unblock
+    elif action == 'Unblock':
+        db.session.query(BlackList).filter(BlackList.id_user == current_user.id, BlackList.id_blocked == _user.id).delete()
+        db.session.commit()"""
 
 @users.route('/create_user/', methods=['GET', 'POST'])
 def create_user():
@@ -185,3 +222,60 @@ def _users():
         
         return render_template('users.html', users=users, blocked_users=_blocked_users, action=action_template)
 
+    # POST
+    # Retrieve action and target user email
+    if request.method == 'POST':
+        action_todo = request.form['action']
+        user_email = request.form.get('email')
+        response = moderate_action(user_email, action_todo) # apply action
+
+        json_payload = response.json()
+        if response.status_code == 202:
+            # Successfull
+            flash(json_payload['message'])
+        else:
+            flash('Error while applying moderating action to the user')
+
+        return redirect(url_for('users._users'))
+
+
+@users.route('/reported_users/', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def reported_users():
+    '''Manage the list of reported users
+
+        GET: show the list of reported users with all possible actions: 
+                - reject
+                - ban
+
+        POST: if <action_todo> = <Reject>: reject the report
+              if <action_todo> = <Ban>: ban the reported user
+    '''
+    if request.method == 'GET':
+        users = UserManager.get_users_list()
+
+        reported_users = []
+        for u in users:
+            print(u.email, u.is_reported, u.is_admin)
+            if u.is_reported:
+                reported_users.append(u)
+        print(reported_users)
+
+        return render_template('reported_users.html', reported_users=reported_users)
+
+    """# POST
+    # Retrieve action and target user email
+    elif request.method == 'POST':
+        action_todo = request.form['action']
+        user_email = request.form.get('email')
+        response = moderate_action(user_email, action_todo) # apply action
+
+        json_payload = response.json()
+        if response.status_code == 202:
+            # Successfull: reported
+            flash(json_payload(['message']))
+            return redirect(url_for('users.reported_users'))
+        else:
+            flash('Error while reporting the user')
+            return redirect(url_for('users.reported_users'))"""

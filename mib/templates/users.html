@@ -10,7 +10,7 @@
   <li>
     {{user.id}} {{user.firstname}} {{user.lastname}} ({{user.email}})
       <br>
-      <form action="/users" method="POST">
+      <form action="/users/" method="POST">
         {% if user.id not in blocked_users %}
         <button type="submit" id="action" name="action" value="Block" class="my_button">Block</button>
         {% else %}
@@ -39,7 +39,7 @@
   {% if current_user.is_admin and user.is_banned %}
       <li>
         <p style="color:red">{{user.id}} {{user.firstname}} {{user.lastname}} ({{user.email}})</p>
-      <form action="/users" method="POST">
+      <form action="/users/" method="POST">
         <button type="submit" id="action" name="action" value="Unban" class="my_button">Unban</button>
         <input type="hidden" id="email" name="email" value="{{ user.email }}">
       </form>

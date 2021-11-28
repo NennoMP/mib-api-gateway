@@ -22,12 +22,12 @@ def login(re=False):
     form = LoginForm()
     if form.is_submitted():
         email, password = form.data['email'], form.data['password']
-        user = UserManager.authenticate_user(email, password)
+        user, message = UserManager.authenticate_user(email, password)
         if user is None:
-            # user is not authenticated
-            flash('Invalid credentials')
+            # User is not authenticated or has been banned
+            flash(message)
         else:
-            # user is authenticated
+            # User is authenticated
             login_user(user)
             return redirect(url_for('home.index'))
 
