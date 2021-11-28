@@ -1,15 +1,17 @@
-#import bleach
+import bleach
 import json
 from flask import Blueprint, redirect, render_template, request, abort
-#from flask_login import current_user
+from flask_login import current_user
 
 #from ..access import Access
 #from ..auth import login_required
 #from ..background import notify
-#from ..utils import get_argument
+from .utils import get_argument
 
 #from monolith.database import User, Message, BlackList, db
-#from mib.forms import MessageForm
+from mib.forms.message import MessageForm
+from mib.rao.user_manager import UserManager
+from mib.rao.message_manager import MessageManager
 
 messages= Blueprint('messages', __name__)
 
@@ -22,10 +24,21 @@ allowed_attrs = {'*': ['class','style','color'],
                  'a': ['href', 'rel'],
                  'img': ['src', 'alt','data-filename','style']}
 
+@messages.route('/message/<int:message_id>')
+def message(message_id):
+    '''Allows the user to read a specific message by id.
+
+       GET: display the content of a specific message by id (censored if language_filter is ON)
+    '''
+    _message = MessageManager.get_message_by_id(current_user.get_id(), message_id)
+
+    return render_template('message.html', user=current_user, message=_message)
+
 
 @messages.route('/create_message', methods=['GET', 'POST'])
 #@login_required
 def create_message():
+    return
     '''Manage the creation, reply, and the forward of messages and drafts.
        GET: Creates the form for editing/writing a message.
             If <draft_id> is specified, the corresponding draft is loaded.
@@ -109,10 +122,8 @@ def create_message():
             return render_template('/error.html', error=error), 409
     # GET
     else:
-        #TODO: get from users la users_list per popolare il form
         form.users_list.choices = [
-            #TODO: popolare choices con lista users
-            (user.get_id(), user.get_email()) for user in get_users()
+            (user.get_id(), user.get_email()) for user in UserManager.get_users_list()
         ]
         selected = None
 
@@ -121,9 +132,7 @@ def create_message():
         reply_id = get_argument(request, 'reply_id', int)
 
         if draft_id is not None:
-            #TODO: get a message per ottenere il draft nella forma json per popolare l'oggetto message
-            #TODO: gestire mancata retrieve
-            message = retrieve_message(draft_id)
+            message = MessageManager.get_message_by_id(draft_id)
             #TODO: decidere come gestire questa funzione
             is_sender_or_recipient(message, user_id)
 
