@@ -1,52 +1,54 @@
 {% extends "base.html" %} {% block title %} Reported Users {% endblock %} {% block content %}
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
-<div class="container bootstrap snippets bootdey">
-  <div class="row">
-      <div class="panel panel-default widget">
-          <div class="panel-heading">
-              <h4 class="panel-title">
-                  Reported Users</h4>
-          </div>
-          <div class="panel-body">
-              <ul class="list-group">
-                {% for user in reported_users %}
-                  <li class="list-group-item">
-                      <div class="row">
-                          <div class="col-xs-2 col-md-1">
-                            <div class="thumb">
-                                <img src="data:image/png;base64, {{user.profile_pic}}" width=80/>
-                            </div>
-                           </div>
-                            <div class="col-xs-10 col-md-11">
-                                <div class="candidate-list-info">
-                                    <div class="candidate-list-title">
-                                        <h5 class="mb-0"><a href="#">{{ user.first_name }} {{user.last_name }}</a></h5>
-                                    </div>
-                                    <div class="candidate-list-option">
-                                        <ul class="list-unstyled">
-                                            <li><i class="fas fa-filter pr-1"></i>{{ user.email }}</li>
-                                            <li><i class="fas fa-map-marker-alt pr-1"></i>{{ user.location}}</li>
-                                        </ul>
-                                </div>
-                            </div>
-                            <form action="/reported_users/" method="POST">
-                                <div class="action">
-                                    <button type="submit" name="action" value="Reject" class="btn btn-success btn-xs">Reject</button>
-                                    <button type="submit" name="action" value="Ban" class="btn btn-danger btn-xs">Ban
-                                    </button>
-                                    <input type="hidden" id="email" name="email" value="{{ user.email }}">
-                                </div>
-                            </form>
-                          </div>
-                      </div>
-                  </li>
-                  {% endfor %}
-              </ul>
-          </div>
-      </div>
-  </div>
+<div class="container">
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title text-uppercase mb-0">Reported Users</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table no-wrap user-table mb-0">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="border-0 text-uppercase font-medium pl-4">ID</th>
+                      <th scope="col" class="border-0 text-uppercase font-medium">Name</th>
+                      <th scope="col" class="border-0 text-uppercase font-medium">Email</th>
+                      <th scope="col" class="border-0 text-uppercase font-medium">Location</th>
+                      <th scope="col" class="border-0 text-uppercase font-medium">Moderate</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for user in reported_users %}
+                    <tr>
+                      <td class="pl-4">{{ user.id }}</td>
+                      <td>
+                          <h6 class="font-medium mb-0"> {{ user.first_name }} {{ user.last_name }}</h6>
+                      </td>
+                      <td>
+                          <span class="text-muted"> {{ user.email }}</span><br>
+                      </td>
+                      <td>
+                          <span class="text-muted"> {{ user.location }}</span><br>
+                      </td>
+                      <td>
+                        <form action="/reported_users/" method="POST">
+                                <button type="submit" name="action" value="Reject" class="btn btn-success btn-xs">Reject</button>
+                                <button type="submit" name="action" value="Ban" class="btn btn-danger btn-xs">Ban
+                                </button>
+                                <input type="hidden" id="email" name="email" value="{{ user.email }}">
+                        </form>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 
 {% endblock %} {% block footer %} {% endblock %}
