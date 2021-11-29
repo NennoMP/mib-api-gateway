@@ -250,12 +250,10 @@ def reported_users():
     if request.method == 'GET':
         users = UserManager.get_users_list()
 
-        reported_users = []
-        for u in users:
-            if u.is_reported:
-                reported_users.append(u)
+        reported_users = [user for user in users if user.is_reported]
+        banned_users = [user for user in users if user.is_banned]
 
-        return render_template('reported_users.html', reported_users=reported_users)
+        return render_template('reported_users.html', reported_users=reported_users, banned_users=banned_users)
 
     # POST
     # Retrieve action and target user email

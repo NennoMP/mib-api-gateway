@@ -3,52 +3,72 @@
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
 <div class="container">
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title text-uppercase mb-0">Reported Users</h5>
-            </div>
-            <div class="table-responsive">
-                <table class="table no-wrap user-table mb-0">
-                  <thead>
-                    <tr>
-                      <th scope="col" class="border-0 text-uppercase font-medium pl-4">ID</th>
-                      <th scope="col" class="border-0 text-uppercase font-medium">Name</th>
-                      <th scope="col" class="border-0 text-uppercase font-medium">Email</th>
-                      <th scope="col" class="border-0 text-uppercase font-medium">Location</th>
-                      <th scope="col" class="border-0 text-uppercase font-medium">Moderate</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for user in reported_users %}
-                    <tr>
-                      <td class="pl-4">{{ user.id }}</td>
-                      <td>
-                          <h6 class="font-medium mb-0"> {{ user.first_name }} {{ user.last_name }}</h6>
-                      </td>
-                      <td>
-                          <span class="text-muted"> {{ user.email }}</span><br>
-                      </td>
-                      <td>
-                          <span class="text-muted"> {{ user.location }}</span><br>
-                      </td>
-                      <td>
-                        <form action="/reported_users/" method="POST">
-                                <button type="submit" name="action" value="Reject" class="btn btn-success btn-xs">Reject</button>
-                                <button type="submit" name="action" value="Ban" class="btn btn-danger btn-xs">Ban
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-uppercase mb-0">Reported Users</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table no-wrap user-table mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="border-0 text-uppercase font-medium pl-4">ID</th>
+                                <th scope="col" class="border-0 text-uppercase font-medium">Name</th>
+                                <th scope="col" class="border-0 text-uppercase font-medium">Email</th>
+                                <th scope="col" class="border-0 text-uppercase font-medium">Location</th>
+                                <th scope="col" class="border-0 text-uppercase font-medium">Moderate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in reported_users %}
+                            <tr>
+                                <td class="pl-4">{{ user.id }}</td>
+                                <td>
+                                    <h6 class="font-medium mb-0"> {{ user.first_name }} {{ user.last_name }}</h6>
+                                </td>
+                                <td>
+                                    <span class="text-muted"> {{ user.email }}</span><br>
+                                </td>
+                                <td>
+                                    <span class="text-muted"> {{ user.location }}</span><br>
+                                </td>
+                                <td>
+                                    <form action="/reported_users/" method="POST">
+                                        <button type="submit" name="action" value="Reject" class="btn btn-success btn-xs">Reject</button>
+                                        <button type="submit" name="action" value="Ban" class="btn btn-danger btn-xs">Ban
                                 </button>
-                                <input type="hidden" id="email" name="email" value="{{ user.email }}">
-                        </form>
-                      </td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
+                                        <input type="hidden" id="email" name="email" value="{{ user.email }}">
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %} {% for user in banned_users %}
+                            <tr>
+                                <td class="pl-4">{{ user.id }}</td>
+                                <td>
+                                    <h6 class="font-medium mb-0"> {{ user.first_name }} {{ user.last_name }}</h6>
+                                </td>
+                                <td>
+                                    <span class="text-muted"> {{ user.email }}</span><br>
+                                </td>
+                                <td>
+                                    <span class="text-muted"> {{ user.location }}</span><br>
+                                </td>
+                                <td>
+                                    <form action="/reported_users/" method="POST">
+                                        <button type="submit" name="action" value="Unban" class="btn btn-success btn-xs">Unban
+                                        </button>
+                                        <input type="hidden" id="email" name="email" value="{{ user.email }}">
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 
 {% endblock %} {% block footer %} {% endblock %}
