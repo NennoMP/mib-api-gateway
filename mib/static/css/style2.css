@@ -2,6 +2,14 @@ body {
     padding-top: 30px;
     background: #eee;
 }
+.widget > .panel-heading {
+    padding: 1px 12px;
+    background-image: none;
+    background-color: rgb(43, 40, 40);
+    color: white;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
 .widget .panel-body {
     padding: 0px;
 }
@@ -37,6 +45,9 @@ body {
     border-top-right-radius: 0px;
 }
 .img-user {
-    width: 80px;
+    border-radius: 50%;
     height: auto;
+}
+img {
+    border-radius: 50%;
 }

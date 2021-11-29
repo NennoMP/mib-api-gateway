@@ -255,6 +255,7 @@ def reported_users():
             if u.is_reported:
                 reported_users.append(u)
 
+        print(len(reported_users))
         return render_template('reported_users.html', reported_users=reported_users)
 
     # POST
