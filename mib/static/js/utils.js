@@ -5,3 +5,10 @@ function toggleEdit() {
     document.getElementById('email').readOnly = false
     document.getElementById('location').readOnly = false
 }
+
+// Send delete request message <id>
+function DeleteMessage(id) {
+    fetch('/message/' + id, {
+        method: 'DELETE'
+    }).then(_ => window.location.href = '/mailbox')
+}
