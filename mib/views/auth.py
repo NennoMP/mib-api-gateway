@@ -1,5 +1,5 @@
 from flask import Blueprint, flash, redirect, render_template, url_for
-from flask_login import login_required, login_user, logout_user
+from flask_login import login_required, login_user, logout_user, current_user
 
 from mib.forms import LoginForm
 from mib.rao.user_manager import UserManager
@@ -48,7 +48,8 @@ def logout():
     Returns:
         Redirects the view to the home page
     """
-    
+    response = UserManager.logout_user(current_user.email)
+
     logout_user()
     return redirect(url_for('home.index'))
 

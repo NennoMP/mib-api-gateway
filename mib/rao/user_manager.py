@@ -256,6 +256,34 @@ class UserManager:
             )
 
     @classmethod
+    def logout_user(cls, email: str):
+        """
+        This method logout the user trough users AP
+        :param email: user email
+        :return: None if errors occur.
+        """
+
+        payload = dict(email=email)
+        try:
+            print('trying response....')
+            response = requests.post('%s/logout' % cls.USERS_ENDPOINT,
+                                     json=payload,
+                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
+                                     )
+            print('received response....')
+            json_response = response.json()
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            # We can't connect to Users MS
+            return abort(500)
+        if response.status_code == 200:
+            return json_response['message'], 200
+        else:
+            raise RuntimeError(
+                'Microservice users returned an invalid status code %s, and message %s'
+                % (response.status_code, json_response['message'])
+            )
+
+    @classmethod
     def get_users_list(cls):
         """
         This method contacts the users microservice
