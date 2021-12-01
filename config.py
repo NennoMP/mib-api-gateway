@@ -1,6 +1,6 @@
 class Config(object):
     """
-    Main Configuration for Go Out Safe API Gateway
+    Main Configuration for Message In A Bottle API Gateway
     """
     DEBUG = False
     TESTING = False
@@ -31,6 +31,12 @@ class Config(object):
     MESSAGES_MS_HOST = os.getenv('MESSAGES_MS_HOST', 'localhost')
     MESSAGES_MS_PORT = os.getenv('MESSAGES_MS_PORT', 5002)
     MESSAGES_MS_URL = '%s://%s:%s' % (MESSAGES_MS_PROTO, MESSAGES_MS_HOST, MESSAGES_MS_PORT)
+
+    # blacklist microservice
+    BLACKLIST_MS_PROTO = os.getenv('BLACKLIST_MS_PROTO', 'http')
+    BLACKLIST_MS_HOST = os.getenv('BLACKLIST_MS_HOST', 'localhost')
+    BLACKLIST_MS_PORT = os.getenv('BLACKLIST_MS_PORT', 5003)
+    BLACKLIST_MS_URL = '%s://%s:%s' % (BLACKLIST_MS_PROTO, BLACKLIST_MS_HOST, BLACKLIST_MS_PORT)
 
 
     # Configuring sessions
