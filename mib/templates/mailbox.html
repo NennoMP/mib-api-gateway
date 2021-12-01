@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div>
+  <div id='sent' style='width: 33%; float: left'>
+    <h2>Sent messages</h2>
+    <ul>
+      {% for message in sent_messages: %}
+        <li>
+          <a href="/message/{{message.id}}">To</a> {{message.text|jBleach|safe}}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div id='received' style='width: 34%; float: left'>
+    <h2>Received messages</h2>
+    <ul>
+      {% for message in received_messages: %}
+          <li>
+            <a href="/message/{{message.id}}">From </a> 
+          </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div id='drafts' style='width: 32%; float: left'>
+    <h2>Draft messages</h2>
+    <ul>
+      {% for message in draft_messages: %}
+          <li>
+            {{message.text|jBleach|safe}}
+            <a href="/create_message?draft_id={{message.id}}">Edit</a> 
+            <a href="/message/{{message.id}}">View</a> 
+          </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% endblock %}

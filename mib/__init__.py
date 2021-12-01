@@ -3,12 +3,20 @@ import os
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_environments import Environments
+import bleach
 
 __version__ = '0.1'
 
 login = None
 debug_toolbar = None
 app = None
+
+allowed_tags_sum = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
+                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                        'h1', 'h2', 'h3', 'iframe', 'span', 'hr', 'src', 'class','font','u']
+allowed_attrs_sum = {'*': ['class','style','color'],
+                        'a': ['href', 'rel'],
+                        'img': ['src', 'alt','data-filename','style']}
 
 
 def create_app():
@@ -46,6 +54,11 @@ def create_app():
 
     if flask_env == 'testing' or flask_env == 'development':
         register_test_blueprints(app)
+
+    def jBleach(value):
+        return bleach.clean(value, tags=allowed_tags_sum, attributes=allowed_attrs_sum, strip=True)
+
+    app.jinja_env.filters['jBleach'] = jBleach    
 
     return app
 

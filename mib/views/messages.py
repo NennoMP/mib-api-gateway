@@ -1,6 +1,7 @@
 import bleach
 import json
 from flask import Blueprint, redirect, render_template, request, abort
+from flask.json import jsonify
 from flask_login import current_user
 
 #from ..access import Access
@@ -24,21 +25,50 @@ allowed_attrs = {'*': ['class','style','color'],
                  'a': ['href', 'rel'],
                  'img': ['src', 'alt','data-filename','style']}
 
-@messages.route('/message/<int:message_id>')
+#retrieve message or delete
+@messages.route('/message/<int:message_id>',methods=['GET','DELETE'])
 def message(message_id):
+
     '''Allows the user to read a specific message by id.
 
        GET: display the content of a specific message by id (censored if language_filter is ON)
     '''
-    _message = MessageManager.get_message_by_id(current_user.get_id(), message_id)
+    if request.method=='GET':
+        _message = MessageManager.get_message_by_id(current_user.get_id(), message_id)
 
-    return render_template('message.html', user=current_user, message=_message)
+        return render_template('message.html', user=current_user, message=_message)
+    
+    MessageManager.delete_message_by_id(current_user.get_id(), message_id)
+    return redirect("/mailbox")
+
+@messages.route('/mailbox')
+def mailbox():
+    '''Manage the user's sent and received messages, aswell as the drafts.
+       GET: display the list of drafts, sent and received messages
+       POST: perform an action on drafts and messages
+             if <message> in <sent_messages> AND <To> button is clicked: display information about the recipient
+             if <message> in <received_messages> AND <From> button is clicked: display information about the sender
+             if <message> in <draft_messages>
+             if <Edit> button is clicked: allows to edit the message text, delivery_date and recipients
+             if <View> button is clicked: display the message information
+    '''
+    # Retrieve user <id>
+    id = current_user.get_id()
+
+    # Retrieve sent messages of user <id>
+    sent_messages,received_messages,draft_messages = MessageManager.get_all_messages(id)
+
+    return render_template('mailbox.html', sent_messages=sent_messages,
+                                           received_messages=received_messages,
+                                           draft_messages=draft_messages
+    )
+
 
 
 @messages.route('/create_message', methods=['GET', 'POST'])
 #@login_required
 def create_message():
-    return
+    #return
     '''Manage the creation, reply, and the forward of messages and drafts.
        GET: Creates the form for editing/writing a message.
             If <draft_id> is specified, the corresponding draft is loaded.
@@ -65,50 +95,76 @@ def create_message():
                 if form.message_id_hidden.data > 0:
                     #TODO: get message from messages where message_id= form.message_id_hidden.data
                     #TODO: post/put to messages json{con i dati seguenti}  
-                    message = retrieve_message(form.message_id_hidden.data)
-                    message.text = clean_text
-                    message.delivery_date = form.delivery_date.data
-                    message.sender_id = user_id
-                    message.recipient_id = 0
+                    #message = MessageManager.get_message_by_id(form.message_id_hidden.data)
+                    # message.text = clean_text
+                    # message.delivery_date = form.delivery_date.data
+                    # message.sender_id = user_id
+                    # message.recipient_id = 0
+                    #TODO: chiamata al servizio update
 
+                    new_message= { 'text':clean_text,'delivery_date': str(form.delivery_date.data),'is_draft':True,'recipient_id':0}
+                    body=json.dumps({'message':new_message}) 
+                    MessageManager.update_message(user_id,form.message_id_hidden.data,body)  
 
                 # Create new draft.
                 else:
                     #TODO: post/put to messages json{con i dati seguenti} 
-                    new_message = Message()
-                    new_message.text = clean_text
-                    new_message.delivery_date = form.delivery_date.data
-                    new_message.sender_id = user_id
-                    new_message.recipient_id = 0
+                    
+                        new_message ={'text' : clean_text,
+                                     'delivery_date': str(form.delivery_date.data),
+                                     'sender_id': user_id,
+                                     'is_draft':True,
+                                     'recipient_id':0}
+                                    
+
+                        body=json.dumps({'message':new_message}) 
+                        #body='{"message":{"text":"prova"}}'           
+                        MessageManager.create_message(body)                 
+
+
 
             # Send.
             else:
                 #TODO: get from blacklist blocked user list per il check
                 for recipient in form.users_list.data:
-                    if is_blocked(recipient):
-                        continue
+                #    if is_blocked(recipient):
+                #       continue
 
                     # send new message from draft to first recipient
                     #TODO: get message from messages where message_id= form.message_id_hidden.data
                     #TODO: post/put to messages json{con i dati seguenti} 
                     if form.message_id_hidden.data > 0:
-                        message = retrieve_message(form.message_id_hidden.data)
-                        message.is_draft = False
-                        message.text = clean_text
-                        message.delivery_date = form.delivery_date.data
-                        message.sender_id = user_id
-                        message.recipient_id = recipient
+                        # message = MessageManager.get_message_by_id(form.message_id_hidden.data)
+                        # message.is_draft = False
+                        # message.text = clean_text
+                        # message.delivery_date = form.delivery_date.data
+                        # message.sender_id = user_id
+                        # message.recipient_id = recipient
+
+                        new_message= { 'text':clean_text,'delivery_date': str(form.delivery_date.data),'is_draft':False,'recipient_id':recipient}
+                        body=json.dumps({'message':new_message}) 
+                        MessageManager.update_message(user_id,form.message_id_hidden.data,body)  
                         form.message_id_hidden.data = -1
+
+                        #TODO: chiamata all'update
+
                     else:
                         #TODO: post/put to messages json{con i dati seguenti} 
                         # send new message [from draft] to [other] recipients
-                        new_message = Message()
-                        new_message.text = clean_text
-                        new_message.delivery_date = form.delivery_date.data
-                        new_message.is_draft = False
-                        new_message.sender_id = user_id
-                        new_message.recipient_id = recipient
-            #TODO: mailbox page sull'APIgateway per la retrieve dei messaggi "sent, received,draft" 
+
+                        new_message ={'text' : clean_text,
+                                      'delivery_date': str(form.delivery_date.data),
+                                      'sender_id': user_id,
+                                      'is_draft':False,
+                                      'recipient_id':recipient}
+                                    
+
+                        #body={'message':json.dumps(new_message)} 
+                        body=json.dumps({'message':new_message}) 
+                        #body='{"message":{"text":"prova"}}'           
+                        MessageManager.create_message(body) 
+
+         
             return redirect('/mailbox')
 
         else:
@@ -132,39 +188,51 @@ def create_message():
         reply_id = get_argument(request, 'reply_id', int)
 
         if draft_id is not None:
-            message = MessageManager.get_message_by_id(draft_id)
-            #TODO: decidere come gestire questa funzione
-            is_sender_or_recipient(message, user_id)
+
+            try:
+                message = MessageManager.get_message_by_id(user_id,draft_id)
+            except:
+                #TODO: gestione dell'internal server error microservizio
+                error = '<h3>Error!</h3><br/> The message is not correct!'
+                return render_template('/error.html', error=error),403
 
             if not message.is_draft:
                 error = '<h3>Error!</h3><br/> The message is not a draft!'
                 # Forbidden
                 return render_template('/error.html', error=error),403
 
-            form.message_id_hidden.data = message.get_id()
-            form.text_area.data = message.get_text()
-            form.delivery_date.data = message.get_delivery_date()
+            form.message_id_hidden.data = message.id
+            form.text_area.data = message.text
+            form.delivery_date.data = message.delivery_date
 
         elif forw_id is not None:
             #TODO: get a message per ottenere il draft nella forma json per popolare l'oggetto message
             #TODO: gestire mancata retrieve
-            message = retrieve_message(forw_id)
-            is_sender_or_recipient(message, user_id)
+            try:
+                message = MessageManager.get_message_by_id(user_id,forw_id)
+            except:
+                #TODO: gestione dell'internal server error microservizio
+                error = '<h3>Error!</h3><br/> The message is not correct!'
+                return render_template('/error.html', error=error),403
+
 
             # draft or scheduled message
             if message.is_draft or not message.is_delivered:
                 error = '<h3>Error!</h3><br/> you can\'t forward this message!'
-
                 # Forbidden
                 return render_template('/error.html', error=error), 403
 
-            form.text_area.data = f'Forwarded: {message.get_text()}'
+            form.text_area.data = f'Forwarded: {message.text}'
 
         elif reply_id is not None:
             #TODO: get a message per ottenere il draft nella forma json per popolare l'oggetto message
             #TODO: gestire mancata retrieve
-            message = retrieve_message(reply_id)
-            is_sender_or_recipient(message, user_id)
+            try:
+                message = MessageManager.get_message_by_id(user_id,reply_id)
+            except:
+                #TODO: gestione dell'internal server error microservizio
+                error = '<h3>Error!</h3><br/> The message is not correct!'
+                return render_template('/error.html', error=error),403
 
             if message.is_draft or not message.is_delivered:
                 error = '<h3>Error!</h3><br/> you can\'t reply this message!'
@@ -173,6 +241,6 @@ def create_message():
                 return render_template('/error.html', error=error), 403
 
             form.text_area.data = 'Reply: '
-            selected = message.get_sender()
+            selected = message.sender_id
 
         return render_template('create_message.html', form=form, selected=selected)
