@@ -50,6 +50,10 @@ def logout():
     """
     response = UserManager.logout_user(current_user.email)
 
-    logout_user()
+    if response.status_code == 200:
+        logout_user()
+    else:
+        flash('Error while logging out the user')
+        
     return redirect(url_for('home.index'))
 
