@@ -7,7 +7,7 @@
     <ul>
       {% for message in sent_messages: %}
         <li>
-          <a href="/message/{{message.id}}">To</a> {{message.text|jBleach|safe}}
+          <a href="/message/{{message.id}}">To</a> {{message.recipient.first_name}} {{message.recipient.last_name}} {{message.text|jBleach|safe}}
         </li>
       {% endfor %}
     </ul>
@@ -18,7 +18,7 @@
     <ul>
       {% for message in received_messages: %}
           <li>
-            <a href="/message/{{message.id}}">From </a> 
+            <a href="/message/{{message.id}}">From </a> {{message.sender.first_name}} {{message.sender.last_name}}
           </li>
       {% endfor %}
     </ul>

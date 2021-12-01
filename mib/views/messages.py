@@ -25,21 +25,33 @@ allowed_attrs = {'*': ['class','style','color'],
                  'a': ['href', 'rel'],
                  'img': ['src', 'alt','data-filename','style']}
 
-#retrieve message or delete
-@messages.route('/message/<int:message_id>',methods=['GET','DELETE'])
-def message(message_id):
 
-    '''Allows the user to read a specific message by id.
+@messages.route('/message/<int:message_id>', methods=['GET', 'DELETE'])
+def message(message_id):
+    '''Allows the user to read or delete a specific message by id.
 
        GET: display the content of a specific message by id (censored if language_filter is ON)
+       DELETE: TODO
     '''
     if request.method=='GET':
         _message = MessageManager.get_message_by_id(current_user.get_id(), message_id)
 
+        # Get sender and recipient first and last names.
+        # TODO: get real names and is_delivered
+        try:
+            sender = UserManager.get_profile_by_id(_message.sender_id)
+            recipient = UserManager.get_profile_by_id(_message.recipient_id)
+            _message.sender['first_name'], _message.sender['last_name'] = sender.first_name, sender.last_name
+            _message.recipient['first_name'], _message.recipient['last_name'] = recipient.first_name, recipient.last_name
+        except:
+            fake_name = 'Undefined'
+            _message.sender['first_name'] = _message.sender['last_name'] = fake_name
+            _message.recipient['first_name'] = _message.recipient['last_name'] = fake_name
         return render_template('message.html', user=current_user, message=_message)
     
     MessageManager.delete_message_by_id(current_user.get_id(), message_id)
     return redirect("/mailbox")
+
 
 @messages.route('/mailbox')
 def mailbox():
@@ -56,7 +68,20 @@ def mailbox():
     id = current_user.get_id()
 
     # Retrieve sent messages of user <id>
-    sent_messages,received_messages,draft_messages = MessageManager.get_all_messages(id)
+    sent_messages, received_messages, draft_messages = MessageManager.get_all_messages(id)
+
+    # TODO: get real names
+    try:
+        for message in sent_messages:
+            recipient = UserManager.get_user_by_id(message.recipient_id)
+            message.recipient['first_name'], message.recipient['last_name'] = recipient.first_name, recipient.last_name
+        for message in received_messages:
+            sender = UserManager.get_user_by_id(message.sender_id)
+            message.sender['first_name'], message.sender['last_name'] = sender.first_name, sender.last_name
+    except:
+        fake_name = 'Undefined'
+        for message in sent_messages: message.recipient['first_name'] = message.recipient['last_name'] = fake_name
+        for message in received_messages: message.sender['first_name'] = message.sender['last_name'] = fake_name
 
     return render_template('mailbox.html', sent_messages=sent_messages,
                                            received_messages=received_messages,

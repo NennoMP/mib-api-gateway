@@ -10,3 +10,5 @@ class Message():
         self.delivery_date = delivery_date
         # Booleans
         self.is_draft = is_draft
+        self.sender = {'first_name': None, 'last_name': None}
+        self.recipient = {'first_name': None, 'last_name': None}
