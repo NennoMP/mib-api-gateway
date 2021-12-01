@@ -4,8 +4,10 @@
 <h1>Message</h1>
   Text: {{message['text']|safe}} <br> 
   On: {{message['delivery_date']}} <br>
-    <button type="submit" onclick="DeleteMessage('{{message.id}}')" class="my_button">Delete</button>
-  {% if not message.is_draft and message.is_delivered %}
+  From: {{message.sender.first_name}} {{message.sender.last_name}} <br>
+  To: {{message.recipient.first_name}} {{message.recipient.last_name}}<br><br>
+    <button type="submit" onclick="DeleteMessage('{{message.id}}')" class="my_button">Delete</button>    
+  {% if not message.is_draft %}
     <a href="/create_message?forw_id={{message.id}}"> <button class="my_button">Forward</button> </a>
     <a href="/create_message?reply_id={{message.id}}"> <button class="my_button">Reply</button> </a>
   {% endif %}      

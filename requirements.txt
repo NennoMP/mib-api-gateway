@@ -1,3 +1,5 @@
+better-profanity==0.7.0
+bleach==4.1.0
 dnspython==2.0.0
 email-validator==1.1.1
 Flask==1.1.2
