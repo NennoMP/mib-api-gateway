@@ -345,56 +345,6 @@ class UserManager:
         return response
 
     @classmethod
-    def block_user(cls, target_id: int, user_id: int):
-        """
-        This method contacts the users microservice
-        and blocks an user for the source user
-        :param user_id: id of the user blocking
-        :param target_id: id of the user being blocked
-        :return: User blocked
-        """
-
-        # Check if users exist
-        """cls.get_user_by_id(target_id)
-        cls.get_user_by_id(user_id)"""
-
-        payload = dict(blocking_user=user_id, blocked_user=target_id)
-        try:
-            url = "%s/blacklist/" % (cls.BLACKLIST_ENDPOINT)
-            response = requests.put(url,
-                                    json=payload,
-                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
-
-        return response
-
-    @classmethod
-    def unblock_user(cls, target_id: int, user_id: int):
-        """
-        This method contacts the users microservice
-        and unblocks an user for the source user
-        :param user_id: id of the user unblocking
-        :param target_id: id of the user being unblocked
-        :return: User unblocked
-        """
-
-        # Check if users exist
-        cls.get_user_by_id(target_id)
-        cls.get_user_by_id(user_id)
-
-        payload = dict(blocking_user=user_id, blocked_user=target_id)
-        try:
-            url = "%s/blacklist/" % (cls.BLACKLIST_ENDPOINT)
-            response = requests.post(url,
-                                    json=payload,
-                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
-
-        return response
-
-    @classmethod
     def update_ban_user(cls, target_id: int, user_id: int):
         """
         This method contacts the users microservice
