@@ -33,11 +33,13 @@ def message(message_id):
        GET: display the content of a specific message by id (censored if language_filter is ON)
        DELETE: TODO
     '''
-    if request.method=='GET':
+    if request.method == 'GET':
+
+        # TODO: try except
         _message = MessageManager.get_message_by_id(current_user.get_id(), message_id)
+        bonus = UserManager.get_profile_by_id(current_user.get_id()).bonus
 
         # Get sender and recipient first and last names.
-        # TODO: get real names and is_delivered
         try:
             sender = UserManager.get_profile_by_id(_message.sender_id)
             recipient = UserManager.get_profile_by_id(_message.recipient_id)
@@ -47,8 +49,10 @@ def message(message_id):
             fake_name = 'Undefined'
             _message.sender['first_name'] = _message.sender['last_name'] = fake_name
             _message.recipient['first_name'] = _message.recipient['last_name'] = fake_name
-        return render_template('message.html', user=current_user, message=_message)
+        return render_template('message.html', bonus=bonus, message=_message)
     
+    # DELETE
+    # TODO: check user bonus > 0
     MessageManager.delete_message_by_id(current_user.get_id(), message_id)
     return redirect("/mailbox")
 
@@ -89,7 +93,6 @@ def mailbox():
     )
 
 
-
 @messages.route('/create_message', methods=['GET', 'POST'])
 #@login_required
 def create_message():
@@ -118,77 +121,62 @@ def create_message():
             if form.save_button.data:
                 # Update old draft.
                 if form.message_id_hidden.data > 0:
-                    #TODO: get message from messages where message_id= form.message_id_hidden.data
-                    #TODO: post/put to messages json{con i dati seguenti}  
-                    #message = MessageManager.get_message_by_id(form.message_id_hidden.data)
-                    # message.text = clean_text
-                    # message.delivery_date = form.delivery_date.data
-                    # message.sender_id = user_id
-                    # message.recipient_id = 0
-                    #TODO: chiamata al servizio update
-
-                    new_message= { 'text':clean_text,'delivery_date': str(form.delivery_date.data),'is_draft':True,'recipient_id':0}
-                    body=json.dumps({'message':new_message}) 
-                    MessageManager.update_message(user_id,form.message_id_hidden.data,body)  
+                    updated_message = {
+                        'text': clean_text,
+                        'delivery_date': str(form.delivery_date.data),
+                        'is_draft': True,
+                        'recipient_id': 0
+                    }
+                    body = json.dumps({'message': updated_message}) 
+                    MessageManager.update_message(user_id, form.message_id_hidden.data, body)  
 
                 # Create new draft.
-                else:
-                    #TODO: post/put to messages json{con i dati seguenti} 
-                    
-                        new_message ={'text' : clean_text,
-                                     'delivery_date': str(form.delivery_date.data),
-                                     'sender_id': user_id,
-                                     'is_draft':True,
-                                     'recipient_id':0}
-                                    
-
-                        body=json.dumps({'message':new_message}) 
-                        #body='{"message":{"text":"prova"}}'           
-                        MessageManager.create_message(body)                 
-
-
+                else:                    
+                    new_message = {
+                        'text': clean_text,
+                        'delivery_date': str(form.delivery_date.data),
+                        'sender_id': user_id,
+                        'is_draft': True,
+                        'recipient_id': 0
+                    }
+                    body = json.dumps({'message': new_message}) 
+                    MessageManager.create_message(body)
 
             # Send.
             else:
                 #TODO: get from blacklist blocked user list per il check
                 for recipient in form.users_list.data:
-                #    if is_blocked(recipient):
-                #       continue
+                    #if is_blocked(recipient):
+                    #    continue
 
                     # send new message from draft to first recipient
                     #TODO: get message from messages where message_id= form.message_id_hidden.data
                     #TODO: post/put to messages json{con i dati seguenti} 
+                    
                     if form.message_id_hidden.data > 0:
-                        # message = MessageManager.get_message_by_id(form.message_id_hidden.data)
-                        # message.is_draft = False
-                        # message.text = clean_text
-                        # message.delivery_date = form.delivery_date.data
-                        # message.sender_id = user_id
-                        # message.recipient_id = recipient
-
-                        new_message= { 'text':clean_text,'delivery_date': str(form.delivery_date.data),'is_draft':False,'recipient_id':recipient}
-                        body=json.dumps({'message':new_message}) 
-                        MessageManager.update_message(user_id,form.message_id_hidden.data,body)  
+                        updated_message = {
+                            'text': clean_text,
+                            'delivery_date': str(form.delivery_date.data),
+                            'is_draft': False,
+                            'recipient_id': recipient
+                        }
+                        body = json.dumps({'message': updated_message}) 
+                        MessageManager.update_message(user_id, form.message_id_hidden.data, body)  
                         form.message_id_hidden.data = -1
-
-                        #TODO: chiamata all'update
 
                     else:
                         #TODO: post/put to messages json{con i dati seguenti} 
                         # send new message [from draft] to [other] recipients
 
-                        new_message ={'text' : clean_text,
-                                      'delivery_date': str(form.delivery_date.data),
-                                      'sender_id': user_id,
-                                      'is_draft':False,
-                                      'recipient_id':recipient}
-                                    
-
-                        #body={'message':json.dumps(new_message)} 
-                        body=json.dumps({'message':new_message}) 
-                        #body='{"message":{"text":"prova"}}'           
-                        MessageManager.create_message(body) 
-
+                        new_message = {
+                            'text': clean_text,
+                            'delivery_date': str(form.delivery_date.data),
+                            'sender_id': user_id,
+                            'is_draft': False,
+                            'recipient_id': recipient
+                        }
+                        body = json.dumps({'message': new_message})          
+                        MessageManager.create_message(body)
          
             return redirect('/mailbox')
 
@@ -201,6 +189,7 @@ def create_message():
                 '''
             # Conflict
             return render_template('/error.html', error=error), 409
+    
     # GET
     else:
         form.users_list.choices = [

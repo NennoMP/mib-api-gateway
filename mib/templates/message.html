@@ -6,8 +6,11 @@
   On: {{message['delivery_date']}} <br>
   From: {{message.sender.first_name}} {{message.sender.last_name}} <br>
   To: {{message.recipient.first_name}} {{message.recipient.last_name}}<br><br>
-    <button type="submit" onclick="DeleteMessage('{{message.id}}')" class="my_button">Delete</button>    
-  {% if not message.is_draft %}
+  {% if (not message.is_draft and not message.is_delivered and bonus > 0) or 
+         message.is_draft or message.is_delivered %}
+    <button type="submit" onclick="DeleteMessage('{{message.id}}')" class="my_button">Delete</button>
+  {% endif %}
+  {% if not message.is_draft and message.is_delivered %}
     <a href="/create_message?forw_id={{message.id}}"> <button class="my_button">Forward</button> </a>
     <a href="/create_message?reply_id={{message.id}}"> <button class="my_button">Reply</button> </a>
   {% endif %}      
