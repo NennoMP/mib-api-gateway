@@ -4,6 +4,7 @@ from flask_login import (login_user, login_required, logout_user, current_user)
 
 from mib.forms.user import UserForm, UnregisterForm, UserProfileForm
 from mib.rao.user_manager import UserManager
+from mib.rao.blacklist_manager import BlacklistManager
 from mib.auth.user import User
 from mib.decorators import admin_required
 from ..utils import image_to_base64
@@ -11,36 +12,34 @@ from ..utils import image_to_base64
 users = Blueprint('users', __name__)
 
 
-def moderate_action(dest_user_email: str, action: str):
+def moderate_action(target_id: int, action: str):
     """
     Utility function used to apply an action to a User object; the possible actions are Ban, Unban, Report, Reject (a report request)
     """
 
-    # ban & unban
+    user_id = current_user.id
+
+    # Block
+    if action == 'Block':
+        response = BlacklistManager.block_user(target_id, user_id)
+    # Unblock
+    if action == 'Unblock':
+        response = BlacklistManager.unblock_user(target_id, user_id)
+    # Ban & Unban
     if action == 'Ban' or action == "Unban":
-        src_user_id = current_user.id
-        response = UserManager.update_ban_user(dest_user_email, src_user_id)
-    # reject
-    elif action == 'Reject':
-        src_user_id = current_user.id
-        response = UserManager.unreport_user(dest_user_email, src_user_id)
-    # report
+        response = UserManager.update_ban_user(target_id, user_id)
+    # Report
     elif action == 'Report':
-        response = UserManager.report_user(dest_user_email)
+        response = UserManager.report_user(target_id)
+    # Reject
+    elif action == 'Reject':
+        response = UserManager.unreport_user(target_id, user_id)
+    # Ban & Unban
+    elif action == 'Ban' or action == "Unban":
+        response = UserManager.update_ban_user(target_id, user_id)
 
     return response
 
-    """# block
-    elif action == 'Block':
-        entry = BlackList()
-        entry.id_user = current_user.id
-        entry.id_blocked = _user.id
-        db.session.add(entry)
-        db.session.commit()
-    # unblock
-    elif action == 'Unblock':
-        db.session.query(BlackList).filter(BlackList.id_user == current_user.id, BlackList.id_blocked == _user.id).delete()
-        db.session.commit()"""
 
 @users.route('/create_user/', methods=['GET', 'POST'])
 def create_user():
@@ -212,20 +211,24 @@ def _users():
     if request.method == 'GET':
         is_admin = current_user.is_admin
         users = UserManager.get_users_list()
-        _blocked_users = []
+        response = BlacklistManager.get_blocked_users(current_user.id)
+
+        _blocked_users = response.json()['blocked_users']
         action_template = 'Ban' if is_admin else 'Report'
-        
-        return render_template('users.html', users=users, blocked_users=_blocked_users, action=action_template)
+
+        return render_template('users.html',
+                            users=users,
+                            blocked_users=_blocked_users, action=action_template)
 
     # POST
     # Retrieve action and target user email
     if request.method == 'POST':
         action_todo = request.form['action']
-        user_email = request.form.get('email')
-        response = moderate_action(user_email, action_todo) # apply action
+        target_id = request.form.get('id')
+        response = moderate_action(target_id, action_todo) # apply action
 
         json_payload = response.json()
-        if response.status_code == 202:
+        if response.status_code == 200 or response.status_code == 202:
             # Successfull
             flash(json_payload['message'])
         else:
@@ -259,8 +262,8 @@ def reported_users():
     # Retrieve action and target user email
     elif request.method == 'POST':
         action_todo = request.form['action']
-        user_email = request.form.get('email')
-        response = moderate_action(user_email, action_todo) # apply action
+        target_id = request.form.get('id')
+        response = moderate_action(target_id, action_todo) # apply action
 
         json_payload = response.json()
         if response.status_code == 202:

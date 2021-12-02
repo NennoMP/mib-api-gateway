@@ -14,6 +14,7 @@ from mib.auth.user import User
 
 class UserManager:
     USERS_ENDPOINT = app.config['USERS_MS_URL']
+    BLACKLIST_ENDPOINT = app.config['BLACKLIST_MS_URL']
     REQUESTS_TIMEOUT_SECONDS = app.config['REQUESTS_TIMEOUT_SECONDS']
 
     @classmethod
@@ -191,7 +192,7 @@ class UserManager:
         :return: User updated
         """
 
-        payload = dict(id=user_id, password=password)
+        payload = dict(password=password)
         try:
             url = "%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id))
             response = requests.post(url,
@@ -276,7 +277,7 @@ class UserManager:
             # We can't connect to Users MS
             return abort(500)
         if response.status_code == 200:
-            return json_response['message'], 200
+            return response
         else:
             raise RuntimeError(
                 'Microservice users returned an invalid status code %s, and message %s'
@@ -305,17 +306,17 @@ class UserManager:
         return users_list
 
     @classmethod
-    def report_user(cls, user_email: str):
+    def report_user(cls, target_id: int):
         """
         This method contacts the users microservice
         and reports a specific user
-        :param user_email: email of the user to report
+        :param target_id: id of the user to report
         :return: User reported
         """
 
         try:
             url = "%s/users/%s/report_user" % (cls.USERS_ENDPOINT,
-                                            user_email)
+                                            str(target_id))
             response = requests.post(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
@@ -323,7 +324,7 @@ class UserManager:
         return response
 
     @classmethod
-    def unreport_user(cls, dest_user_email: str, src_user_id: int):
+    def unreport_user(cls, target_id: int, user_id: int):
         """
         This method contacts the users microservice
         and reject a report of a specific user
@@ -331,10 +332,10 @@ class UserManager:
         :return: User unreported
         """
 
-        payload = dict(src_user_id=src_user_id)
+        payload = dict(user_id=user_id)
         try:
             url = "%s/users/%s/unreport_user" % (cls.USERS_ENDPOINT,
-                                            dest_user_email)
+                                            str(target_id))
             response = requests.post(url,
                                     json=payload,
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
@@ -344,19 +345,47 @@ class UserManager:
         return response
 
     @classmethod
-    def update_block_user(cls, dest_user_id: int, src_user_id: int):
+    def block_user(cls, target_id: int, user_id: int):
         """
         This method contacts the users microservice
-        and (un)blocks an user for the source user
-        :param src_user_id: id of the user (un)blocking
-        :param dest_user_id: id of the user being (un)blocked
-        :return: User (un)blocked
+        and blocks an user for the source user
+        :param user_id: id of the user blocking
+        :param target_id: id of the user being blocked
+        :return: User blocked
         """
 
-        payload = dict(src_user_id=src_user_id)
+        # Check if users exist
+        """cls.get_user_by_id(target_id)
+        cls.get_user_by_id(user_id)"""
+
+        payload = dict(blocking_user=user_id, blocked_user=target_id)
         try:
-            url = "%s/users/%s/update_block_user" % (cls.USERS_ENDPOINT,
-                                                str(dest_user_id))
+            url = "%s/blacklist/" % (cls.BLACKLIST_ENDPOINT)
+            response = requests.put(url,
+                                    json=payload,
+                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+
+        return response
+
+    @classmethod
+    def unblock_user(cls, target_id: int, user_id: int):
+        """
+        This method contacts the users microservice
+        and unblocks an user for the source user
+        :param user_id: id of the user unblocking
+        :param target_id: id of the user being unblocked
+        :return: User unblocked
+        """
+
+        # Check if users exist
+        cls.get_user_by_id(target_id)
+        cls.get_user_by_id(user_id)
+
+        payload = dict(blocking_user=user_id, blocked_user=target_id)
+        try:
+            url = "%s/blacklist/" % (cls.BLACKLIST_ENDPOINT)
             response = requests.post(url,
                                     json=payload,
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
@@ -366,7 +395,7 @@ class UserManager:
         return response
 
     @classmethod
-    def update_ban_user(cls, dest_user_email: str, src_user_id: int):
+    def update_ban_user(cls, target_id: int, user_id: int):
         """
         This method contacts the users microservice
         and (un)bans an user.
@@ -375,10 +404,10 @@ class UserManager:
         :return: User (un)banned
         """
 
-        payload = dict(src_user_id=src_user_id)
+        payload = dict(user_id=user_id)
         try:
             url = "%s/users/%s/update_ban_user" % (cls.USERS_ENDPOINT,
-                                                dest_user_email)
+                                                str(target_id))
             response = requests.post(url,
                                     json=payload,
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)

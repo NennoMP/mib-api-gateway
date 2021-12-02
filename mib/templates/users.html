@@ -37,11 +37,13 @@
                             <ul class="list-unstyled mb-0 d-flex justify-content-end">
                                 <form action="/users/" method="POST">
                                     {% if user.id not in blocked_users %}
-                                    <button type="submit" id="action" name="action" value="Block" class="btn btn-danger btn-xs">Block</button> {% else %}
-                                    <button type="submit" id="action" name="action" value="Unblock" class="btn btn-success btn-xs">Unblock</button> {% endif %}
+                                    <button type="submit" id="action" name="action" value="Block" class="btn btn-danger btn-xs">Block</button> 
+                                    {% else %}
+                                    <button type="submit" id="action" name="action" value="Unblock" class="btn btn-success btn-xs">Unblock</button> 
+                                    {% endif %}
                                     <br><br>
                                     <button type="submit" id="action" name="action" value="{{ action }}" class="btn btn-danger btn-xs">{{ action }}</button>
-                                    <input type="hidden" id="email" name="email" value="{{ user.email }}">
+                                    <input type="hidden" id="id" name="id" value="{{ user.id }}">
                                 </form>
                             </ul>
                         </td>
