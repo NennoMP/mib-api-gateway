@@ -2,6 +2,10 @@ body{
     background: #edf1f5;
     margin-top:20px;
 }
+img {
+    border-radius: 50%;
+    height: auto;
+}
 .card {
     position: relative;
     display: flex;
