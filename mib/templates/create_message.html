@@ -35,14 +35,13 @@
 </form>
 
 <script>
+  // Fancy multiple recipients with selectize
   const list = $("#users_list").selectize({placeholder: 'Select recipients', create: true})
   const selectize = list[0].selectize
   selectize.setValue({{selected}})
-</script>
-<script>
-  $(document).ready(function() {
-    $("#text").summernote();
-  });
+  
+  // Fancy textfield with summernote
+  $("#text").summernote();
 </script>
 
 {% endblock %}

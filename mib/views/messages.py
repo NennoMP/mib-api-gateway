@@ -195,7 +195,7 @@ def create_message():
         form.users_list.choices = [
             (user.get_id(), user.get_email()) for user in UserManager.get_users_list()
         ]
-        selected = None
+        selected = 0
 
         draft_id = get_argument(request, 'draft_id', int)
         forw_id = get_argument(request, 'forw_id', int)
