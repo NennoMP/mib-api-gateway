@@ -13,5 +13,4 @@ class TestHome(ViewTest):
 
     def test_home(self):
         rv = self.client.get(self.BASE_URL+'/')
-        print(rv)
         assert rv.status_code == 200
