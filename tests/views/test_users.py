@@ -61,15 +61,14 @@ class TestUser(ViewTest):
                 )
                 assert response is not None
 
-    @patch('mib.rao.user_manager.requests.post')
-    def test_get_report(self, mock_get):
-        
+    @patch('mib.rao.user_manager.requests.get')
+    def test_get_reported(self, mock_get):
         user = self.generate_user()
         mock_get.return_value = Mock(
             status_code=200,
             json=lambda: {
                 'status': 'success',
-                'user_list': user,
+                'users_list': user
                 }
         )
         
@@ -79,6 +78,24 @@ class TestUser(ViewTest):
         )
 
         assert response is not None
+
+    @patch('mib.rao.user_manager.requests.post')
+    def test_unregister(self, mock_post):
+        user = self.generate_user()
+        mock_post.return_value = Mock(
+            status_code=202,
+            json=lambda: {
+                'status': 'success'
+            }
+        )
+
+        response = self.client.post(
+            self.BASE_URL+'/unregister_user/',
+            json=user
+        )
+
+        assert response is not None
+
 
 
 
