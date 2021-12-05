@@ -18,7 +18,7 @@
     <ul>
       {% for message in received_messages: %}
           <li>
-            <a href="/message/{{message.id}}">From </a> {{message.sender.first_name}} {{message.sender.last_name}}
+            <a href="/message/{{message.id}}">From</a> {{message.sender.first_name}} {{message.sender.last_name}}
           </li>
       {% endfor %}
     </ul>
