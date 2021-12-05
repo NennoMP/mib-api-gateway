@@ -1,20 +1,19 @@
 import bleach
 import json
-from flask import Blueprint, redirect, render_template, request, abort
-from flask.json import jsonify
+from flask import Blueprint, redirect, render_template, request
 from flask_login import current_user
 
-#from ..access import Access
 #from ..auth import login_required
 #from ..background import notify
 from .utils import get_argument
 
-#from monolith.database import User, Message, BlackList, db
 from mib.forms.message import MessageForm
 from mib.rao.user_manager import UserManager
 from mib.rao.message_manager import MessageManager
 
-messages= Blueprint('messages', __name__)
+
+messages = Blueprint('messages', __name__)
+
 
 allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
                 'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
@@ -96,7 +95,6 @@ def mailbox():
 @messages.route('/create_message', methods=['GET', 'POST'])
 #@login_required
 def create_message():
-    #return
     '''Manage the creation, reply, and the forward of messages and drafts.
        GET: Creates the form for editing/writing a message.
             If <draft_id> is specified, the corresponding draft is loaded.
@@ -128,7 +126,7 @@ def create_message():
                         'recipient_id': 0
                     }
                     body = json.dumps({'message': updated_message}) 
-                    MessageManager.update_message(user_id, form.message_id_hidden.data, body)  
+                    MessageManager.update_message(user_id, form.message_id_hidden.data, body)
 
                 # Create new draft.
                 else:                    
@@ -148,11 +146,7 @@ def create_message():
                 for recipient in form.users_list.data:
                     #if is_blocked(recipient):
                     #    continue
-
-                    # send new message from draft to first recipient
-                    #TODO: get message from messages where message_id= form.message_id_hidden.data
-                    #TODO: post/put to messages json{con i dati seguenti} 
-                    
+                
                     if form.message_id_hidden.data > 0:
                         updated_message = {
                             'text': clean_text,
@@ -160,14 +154,11 @@ def create_message():
                             'is_draft': False,
                             'recipient_id': recipient
                         }
-                        body = json.dumps({'message': updated_message}) 
-                        MessageManager.update_message(user_id, form.message_id_hidden.data, body)  
+                        body = json.dumps({'message': updated_message})
+                        MessageManager.update_message(user_id, form.message_id_hidden.data, body)
                         form.message_id_hidden.data = -1
 
                     else:
-                        #TODO: post/put to messages json{con i dati seguenti} 
-                        # send new message [from draft] to [other] recipients
-
                         new_message = {
                             'text': clean_text,
                             'delivery_date': str(form.delivery_date.data),
@@ -175,7 +166,7 @@ def create_message():
                             'is_draft': False,
                             'recipient_id': recipient
                         }
-                        body = json.dumps({'message': new_message})          
+                        body = json.dumps({'message': new_message})
                         MessageManager.create_message(body)
          
             return redirect('/mailbox')
@@ -213,7 +204,7 @@ def create_message():
             if not message.is_draft:
                 error = '<h3>Error!</h3><br/> The message is not a draft!'
                 # Forbidden
-                return render_template('/error.html', error=error),403
+                return render_template('/error.html', error=error), 403
 
             form.message_id_hidden.data = message.id
             form.text_area.data = message.text
@@ -227,7 +218,7 @@ def create_message():
             except:
                 #TODO: gestione dell'internal server error microservizio
                 error = '<h3>Error!</h3><br/> The message is not correct!'
-                return render_template('/error.html', error=error),403
+                return render_template('/error.html', error=error), 403
 
 
             # draft or scheduled message
@@ -246,7 +237,7 @@ def create_message():
             except:
                 #TODO: gestione dell'internal server error microservizio
                 error = '<h3>Error!</h3><br/> The message is not correct!'
-                return render_template('/error.html', error=error),403
+                return render_template('/error.html', error=error), 403
 
             if message.is_draft or not message.is_delivered:
                 error = '<h3>Error!</h3><br/> you can\'t reply this message!'
