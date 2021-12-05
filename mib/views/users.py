@@ -58,6 +58,7 @@ def create_user():
         date_of_birth = form.data['date_of_birth']
         date_of_birth = date_of_birth.strftime('%Y-%m-%d')
         location = form.data['location']
+        
         response = UserManager.create_user(
             email,
             password,

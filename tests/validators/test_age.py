@@ -17,14 +17,14 @@ class TestAgeValidator(ValidatorTest):
 
     def setUp(self):
         super(TestAgeValidator, self).setUp()
-        from mib.validators import age
+        from mib.validators.validators import AgeValidator
 
-        self.age_validator = age
+        self.age_validator = AgeValidator
 
     def test_init_str(self):
         with self.assertRaises(ValueError):
-            self.age_validator.AgeValidator(min_age=TestAgeValidator.faker.street_name())
-            self.age_validator.AgeValidator(max_age=TestAgeValidator.faker.street_name())
+            self.age_validator(min_age=TestAgeValidator.faker.street_name())
+            self.age_validator(max_age=TestAgeValidator.faker.street_name())
             self.age_validator.AgeValidator(
                 min_age=TestAgeValidator.faker.street_name(),
                 max_age=TestAgeValidator.faker.street_name()
@@ -32,24 +32,24 @@ class TestAgeValidator(ValidatorTest):
 
     def test_init_bounds(self):
         with self.assertRaises(ValueError):
-            self.age_validator.AgeValidator(min_age=-1)
-            self.age_validator.AgeValidator(max_age=-1)
-            self.age_validator.AgeValidator(min_age=-1, max_age=-1)
+            self.age_validator(min_age=-1)
+            self.age_validator(max_age=-1)
+            self.age_validator(min_age=-1, max_age=-1)
 
     def test_init_validity(self):
         with self.assertRaises(ValueError):
-            self.age_validator.AgeValidator(
+            self.age_validator(
                 min_age=random.randint(101, 200),
                 max_age=random.randint(0, 100)
             )
 
-        self.age_validator.AgeValidator(
+        self.age_validator(
             min_age=random.randint(0, 100),
             max_age=random.randint(101, 200)
         )
 
     def test_invalid_date(self):
-        av = self.age_validator.AgeValidator(
+        av = self.age_validator(
             min_age=0,
             max_age=30
         )
@@ -58,7 +58,7 @@ class TestAgeValidator(ValidatorTest):
             av.__call__(None, AnonymousField(None))
 
     def test_valid_call_unbounded(self):
-        av = self.age_validator.AgeValidator(
+        av = self.age_validator(
             min_age=0,
             max_age=30
         )
@@ -68,7 +68,7 @@ class TestAgeValidator(ValidatorTest):
 
         av.__call__(None, field)
 
-        av = self.age_validator.AgeValidator(
+        av = self.age_validator(
             min_age=30,
             max_age=0
         )
@@ -79,7 +79,7 @@ class TestAgeValidator(ValidatorTest):
         av.__call__(None, field)
 
     def test_valid_call_bounded(self):
-        av = self.age_validator.AgeValidator(
+        av = self.age_validator(
             min_age=10,
             max_age=30
         )
@@ -90,7 +90,7 @@ class TestAgeValidator(ValidatorTest):
         av.__call__(None, field)
 
     def test_invalid_call_bounded(self):
-        av = self.age_validator.AgeValidator(
+        av = self.age_validator(
             min_age=10,
             max_age=30
         )
@@ -101,7 +101,7 @@ class TestAgeValidator(ValidatorTest):
         with self.assertRaises(ValidationError):
             av.__call__(None, field)
 
-        av = self.age_validator.AgeValidator(
+        av = self.age_validator(
             min_age=10,
             max_age=30
         )
@@ -113,7 +113,7 @@ class TestAgeValidator(ValidatorTest):
             av.__call__(None, field)
 
     def test_invalid_call_unbounded(self):
-        av = self.age_validator.AgeValidator(
+        av = self.age_validator(
             min_age=0,
             max_age=30
         )
@@ -124,7 +124,7 @@ class TestAgeValidator(ValidatorTest):
         with self.assertRaises(ValidationError):
             av.__call__(None, field)
 
-        av = self.age_validator.AgeValidator(
+        av = self.age_validator(
             min_age=30,
             max_age=0
         )

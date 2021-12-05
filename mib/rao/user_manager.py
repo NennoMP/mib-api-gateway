@@ -177,11 +177,11 @@ class UserManager:
                                     },
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS
                                     )
-                                    
-            return response
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
+
+        return response
 
     @classmethod
     def unregister_user(cls, user_id: int, password: str):
@@ -198,25 +198,6 @@ class UserManager:
             response = requests.post(url,
                                         json=payload,
                                         timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            return abort(500)
-
-        return response
-
-    @classmethod
-    def delete_user(cls, user_id: int):
-        """
-        This method contacts the users microservice
-        to delete the account of the user
-        :param user_id: the user id
-        :return: User updated
-        """
-        
-        try:
-            logout_user()
-            url = "%s/user/%s" % (cls.USERS_ENDPOINT, str(user_id))
-            response = requests.delete(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
 

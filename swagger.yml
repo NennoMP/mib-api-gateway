@@ -50,65 +50,7 @@ paths:
       summary: Utility route used to handle the user's session expiration
       responses:
         200:
-          description: Calls the login method
-  
-  /profile/{id}:
-    get:
-      tags: [ User ]
-      summary: Shows the profile page of the customer specified by the id
-      parameters:
-      - name: id
-        in: path
-        description: Customer's unique identifier
-        required: true
-        schema:
-          type: integer
-      responses:
-        200:
-          description: Renders the customer_profile template
-        404:
-          description: Redirects to the customer profile page with error, in case the user accessing the profile is not its owner
-    
-    post:
-      summary: Updates the fields for the customer profile depending on its id
-      tags:
-        - Users
-      parameters:
-        - name: id
-          description: User Unique ID
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  description: the email field for the user
-                firstname:
-                  type: string
-                  description: the name field for the user
-                lastname:
-                  type: string
-                  description: the lastname field for the user
-                location:
-                  type: string
-                  description: the location field for the user
-              required:
-                - email
-                - firstname
-                - lastname
-                - location
-      responses:
-        302:
-          description: Redirects to the customer profile page
-        
+          description: Calls the login method   
 
   /logout:
     get:
@@ -118,10 +60,42 @@ paths:
         302:
           description: Redirects to the homepage
 
-  /user/:
+  /unregister_user:
     get:
       tags: [ User ]
-      summary: This method allows to retrieve the sign up page for a new user
+      summary: This method retrieves the unregister page for an user
+      responses:
+        200:
+          description: Return the unregister.html template
+
+    post:
+      tags: [ User ]
+      summary: This method allows the unregistration of an user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              x-body-name: body
+              type: object
+              required:
+                - password
+              properties:
+                password:
+                  type: string
+                  description: The inserted password for confirmation
+      responses:
+        202:
+          description: User unregistered, redirects to the home
+        401:
+          description: Invalid credentials, reloads the page
+        404:
+          description: User not found, reloads the page
+
+  /create_user/:
+    get:
+      tags: [ User ]
+      summary: This method allows retrieves the sign up page for a new user
       parameters:
         - name: type_
           description: type of the user
@@ -133,7 +107,7 @@ paths:
         200:
           description: Renders the create_user template, filled with the fiels for the user's data
     post:
-      summary: Add a new customer
+      summary: This method allows the creation of a new user
       tags: [ User ]
       parameters:
         - name: type_
@@ -155,9 +129,6 @@ paths:
                 password:
                   type: string
                   description: the password field for the user
-                social_number:
-                  type: string
-                  description: the social number field for the user
                 firstname: 
                   type: string
                   description: the firstname field for the user
@@ -173,44 +144,126 @@ paths:
               required:
                 - email
                 - password
+                - firstname
+                - lastname
+                - date_of_birth
+                - location
 
-  /user/{user_id}:
-    delete:
-        tags: [ User ]
-        description: Unregister an user
-        parameters:
-          - name: user_id
-            description: User Unique ID
-            in: path
-            required: true
-            schema:
-              type: integer
-              format: int64
-        requestBody:
+  /users/:
+    get:
+      tags: [ User ]
+      summary: This method retrieves the users list
+      responses:
+        200:
+          description: Return users list
+        default:
+          description: An error occured while retrieving the list
+    post:
+      summary: This method allows the user to apply moderation actions, report and (un)block
+      tags: [ Users ]
+      requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                password:
-                  type: string
-                  description: the inserted password for confirming unregistration
+                user_id:
+                  description: id of the user applying the action
+                target_id
+                  description: id of the user to which the action is applied
               required:
-                - password
-        responses:
-        202:
-          description: User unregistered, redirect to the index page
-        401:
-          description: User password does not match
-        default:
-          description: An error occured during the unregistration of the user
-
-  /users/:
-    get:
-      tags: [ User ]
-      summary: This method allows to retrieve the users list
+                - user_id
+                - target_id
       responses:
         200:
-          description: Renders the users list template
+          description: Action applied, realods the page
+        202:
+          description: Action applied, reloads the page
+        default:
+          description: Error while applying the action, reloads the page with an error message
+
+  /reported_users/:
+    get:
+      tags: [ User ]
+      summary: This method retrieves the reported users list, only for admins
+      responses:
+        200:
+          description: Return reported users list
+        default:
+          description: An error occured while retrieving the list
+    post:
+      summary: This method allows the admin to apply moderation actions, reject and (un)ban
+      tags: [ Users ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  description: id of the admin applying the action
+                target_id
+                  description: id of the user to which the action is applied
+              required:
+                - user_id
+                - target_id
+      responses:
+        202:
+          description: Action applied, reloads the page
+        default:
+          description: Error while applying the action, reloads the page with an error message
+
+  /profile/:
+    get:
+      tags: [ User ]
+      summary: Shows the profile page of the current and loads the UserProfileForm
+      responses:
+        200:
+          description: Renders the profile.html template 
+    post:
+      summary: This method allows the update of profile information, profilce pic and language filter for the user
+      tags: [ Users ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: the new email for the user
+                firstname:
+                  type: string
+                  description: the new name for the user
+                lastname:
+                  type: string
+                  description: the new lastname for the user
+                location:
+                  type: string
+                  description: the new location for the user
+                profile_pic:
+                  type: string
+                  description: binary of the new profile pic
+              required:
+                - email
+                - firstname
+                - lastname
+                - location
+                - profile_pic
+      responses:
+        200:
+          description: Realods the page
+        202:
+          description: Reloads the page
+        404:
+          description: User not gound, reloads the page with an error message
+        409:
+          description: Requested email already exists, reloads the page with an error message
+        default:
+          description: Error while updating processing the update, reloads the page with an error message
+
+
   
