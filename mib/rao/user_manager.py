@@ -287,6 +287,51 @@ class UserManager:
         return users_list
 
     @classmethod
+    def get_bonus(cls, user_id: int):
+        """
+        This method contacts the users microservice
+        to get the bonus of the user
+        :param user_id: id of the user
+        :return: bonus if success, -1 otherwise
+        """
+
+        try:
+            url = "%s/profile/%s/bonus" % (cls.USERS_ENDPOINT,
+                                            str(user_id))
+            response = requests.get(url, timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+        
+        json_payload = response.json()
+        #TODO: check status code
+        return json_payload['bonus']
+        
+    @classmethod
+    def set_bonus(cls, user_id: int, bonus):
+        """
+        This method contacts the users microservice
+        to set the bonus of the user
+        :param user_id: id of the user
+        :return: bonus
+        """
+        payload = dict(bonus=bonus)
+        try:
+            url = "%s/profile/%s/bonus" % (cls.USERS_ENDPOINT,
+                                           str(user_id))
+
+            response = requests.post(url,
+                                     json=payload, 
+                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            return abort(500)
+            
+        
+        return response
+
+
+
+    @classmethod
     def report_user(cls, target_id: int):
         """
         This method contacts the users microservice
