@@ -27,13 +27,13 @@ class ViewTest(unittest.TestCase):
         """
 
         user = {
-            'id': randint(0,999),
+            'id': randint(0,9999),
             'email': 'email@example.com',
             'password': "Password1@",
             'is_active' : True,
-            'authenticated': True,
+            'authenticated': False,
             'is_anonymous': False,
-            'is_admin': False,
+            'is_admin': True,
             'is_reported': False,
             'is_banned': False,
             'firstname': self.faker.first_name(),

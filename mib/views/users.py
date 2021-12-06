@@ -58,7 +58,6 @@ def create_user():
         date_of_birth = form.data['date_of_birth']
         date_of_birth = date_of_birth.strftime('%Y-%m-%d')
         location = form.data['location']
-        
         response = UserManager.create_user(
             email,
             password,
@@ -103,7 +102,6 @@ def unregister_user():
         Returns:
             Redirects the user to the homepage, once unregistered (password confirmation requested)
     """
-
     form = UnregisterForm()
     if form.validate_on_submit():
         password = form.data['password']
@@ -239,8 +237,8 @@ def _users():
 
 
 @users.route('/reported_users/', methods=['GET', 'POST'])
-@login_required
-@admin_required
+#@login_required
+#@admin_required
 def reported_users():
     '''Manage the list of reported users
 
