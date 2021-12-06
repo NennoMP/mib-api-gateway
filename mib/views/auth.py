@@ -48,6 +48,7 @@ def logout():
     Returns:
         Redirects the view to the home page
     """
+
     response = UserManager.logout_user(current_user.email)
     if response.status_code == 200:
         logout_user()

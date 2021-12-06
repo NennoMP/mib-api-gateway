@@ -1,3 +1,4 @@
+import re
 from types import MethodDescriptorType
 from flask import Blueprint, redirect, render_template, url_for, flash, request
 from flask_login import (login_user, login_required, logout_user, current_user)
@@ -16,17 +17,17 @@ def moderate_action(target_id: int, action: str):
     """
     Utility function used to apply an action to a User object; the possible actions are Ban, Unban, Report, Reject (a report request)
     """
-
+    
     user_id = current_user.id
 
     # Block
     if action == 'Block':
         response = BlacklistManager.block_user(target_id, user_id)
     # Unblock
-    if action == 'Unblock':
+    elif action == 'Unblock':
         response = BlacklistManager.unblock_user(target_id, user_id)
     # Ban & Unban
-    if action == 'Ban' or action == "Unban":
+    elif action == 'Ban' or action == "Unban":
         response = UserManager.update_ban_user(target_id, user_id)
     # Report
     elif action == 'Report':
@@ -34,9 +35,6 @@ def moderate_action(target_id: int, action: str):
     # Reject
     elif action == 'Reject':
         response = UserManager.unreport_user(target_id, user_id)
-    # Ban & Unban
-    elif action == 'Ban' or action == "Unban":
-        response = UserManager.update_ban_user(target_id, user_id)
 
     return response
 
@@ -93,35 +91,6 @@ def create_user():
     return render_template('create_user.html', form=form)
 
 
-@users.route('/unregister_user/', methods=['GET', 'POST'])
-@login_required
-def unregister_user():
-    """
-        Unregister an user from the application.
-
-        Returns:
-            Redirects the user to the homepage, once unregistered (password confirmation requested)
-    """
-    form = UnregisterForm()
-    if form.validate_on_submit():
-        password = form.data['password']
-
-        response = UserManager.unregister_user(current_user.id, password)
-        if response.status_code == 202:
-            # Successfull: unregistered
-            logout_user()
-            return redirect(url_for('home.index'))
-        elif response.status_code == 401:
-            # Failed: password does not match
-            flash('Password does not match!')
-            return render_template('unregister.html', form=form)
-        else:
-            flash('Error while unregistering the user!')
-            return render_template('unregister.html', form=form)
-
-    return render_template('unregister.html', form=form)
-
-
 @users.route('/profile/', methods=['GET', 'POST'])
 @login_required
 def profile():
@@ -132,11 +101,10 @@ def profile():
     Returns:
         Redirects the user into his profile page
     """
-
     form = UserProfileForm()
-    # Retrieve profile user information
-    _user = UserManager.get_profile_by_id(current_user.get_id())
     if request.method == 'GET':
+        # Retrieve profile user information
+        _user = UserManager.get_profile_by_id(current_user.get_id())
         # Populate user profile form
         form.firstname.data = _user.first_name
         form.lastname.data = _user.last_name
@@ -146,14 +114,13 @@ def profile():
         form.profile_pic.data = _user.profile_pic
 
         return render_template('profile.html', form=form, user=_user)
-    
     # POST
-    if request.method == 'POST':
+    elif request.method == 'POST':
         action = request.form['action']
 
         # Update profile picture
         if action == "Upload":
-            file = form.profile_pic.data
+            file = form.data['profile_pic']
             format, file = image_to_base64(file)
             response = UserManager.update_profile_pic(current_user.id, format, file)
             if response.status_code == 202:
@@ -207,6 +174,7 @@ def _users():
         POST: if <action_todo> = <Report>: report the chosen user
               if <action_todo> = <Block>: block the chosen user
     '''
+
     if request.method == 'GET':
         is_admin = current_user.is_admin
         users = UserManager.get_users_list()
@@ -218,10 +186,9 @@ def _users():
         return render_template('users.html',
                             users=users,
                             blocked_users=_blocked_users, action=action_template)
-
     # POST
     # Retrieve action and target user email
-    if request.method == 'POST':
+    elif request.method == 'POST':
         action_todo = request.form['action']
         target_id = request.form.get('id')
         response = moderate_action(target_id, action_todo) # apply action
@@ -237,8 +204,8 @@ def _users():
 
 
 @users.route('/reported_users/', methods=['GET', 'POST'])
-#@login_required
-#@admin_required
+@login_required
+@admin_required
 def reported_users():
     '''Manage the list of reported users
 
@@ -270,5 +237,34 @@ def reported_users():
             flash(json_payload['message'])
             return redirect(url_for('users.reported_users'))
         else:
-            flash('Error while reporting the user')
+            flash('Error while applying action to the user')
             return redirect(url_for('users.reported_users'))
+
+
+@users.route('/unregister_user/', methods=['GET', 'POST'])
+@login_required
+def unregister_user():
+    """
+        Unregister an user from the application.
+
+        Returns:
+            Redirects the user to the homepage, once unregistered (password confirmation requested)
+    """
+    form = UnregisterForm()
+    if form.validate_on_submit():
+        password = form.data['password']
+
+        response = UserManager.unregister_user(current_user.id, password)
+        if response.status_code == 202:
+            # Successfull: unregistered
+            logout_user()
+            return redirect(url_for('home.index'))
+        elif response.status_code == 401:
+            # Failed: password does not match
+            flash('Password does not match!')
+            return render_template('unregister.html', form=form)
+        else:
+            flash('Error while unregistering the user!')
+            return render_template('unregister.html', form=form)
+
+    return render_template('unregister.html', form=form)

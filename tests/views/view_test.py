@@ -39,6 +39,8 @@ class ViewTest(unittest.TestCase):
             'firstname': self.faker.first_name(),
             'lastname': self.faker.last_name(),
             'date_of_birth': '1970-07-07',
-            'location': self.faker.city()
+            'location': self.faker.city(),
+            'profile_pic': self.faker.file_path(),
+            'bonus': 0
         }
         return user
