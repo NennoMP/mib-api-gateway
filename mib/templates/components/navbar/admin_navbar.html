@@ -4,6 +4,10 @@
 
 {% endblock %}
 {% block navbar_profile_links %}
+<a class="btn btn-info" href="{{ url_for('messages.create_message') }}">New Message</a>
+<a class="btn btn-info" href="{{ url_for('messages.mailbox') }}">Mailbox</a>
+<a class="btn btn-info" href="{{ url_for('messages.calendar') }}">Calendar</a>
+<a class="btn btn-info" href="{{ url_for('messages.scheduled') }}">Scheduled</a>
 <a class="btn btn-info" href="{{ url_for('users.profile') }}">Profile</a>
 <a class="btn btn-info" href="{{ url_for('users._users') }}">UserList</a>
 <a class="btn btn-info" href="{{ url_for('users.reported_users') }}">ReportedUsers</a>

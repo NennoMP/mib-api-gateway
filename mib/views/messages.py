@@ -3,7 +3,7 @@ import json
 from flask import Blueprint, redirect, render_template, request
 from flask_login import current_user
 
-#from ..auth import login_required
+from .auth import login_required
 #from ..background import notify
 from .utils import get_argument
 
@@ -70,10 +70,9 @@ def mailbox():
     # Retrieve user <id>
     id = current_user.get_id()
 
-    # Retrieve sent messages of user <id>
-    sent_messages, received_messages, draft_messages = MessageManager.get_all_messages(id)
+    # Retrieve all messages of user <id>
+    sent_messages, received_messages, draft_messages, _ = MessageManager.get_all_messages(id)
 
-    # TODO: get real names
     try:
         for message in sent_messages:
             recipient = UserManager.get_user_by_id(message.recipient_id)
@@ -249,3 +248,73 @@ def create_message():
             selected = message.sender_id
 
         return render_template('create_message.html', form=form, selected=selected)
+
+@messages.route('/calendar')
+@login_required
+def calendar():
+    '''Display a calendar with the messages scheduled to be sent in each day.
+
+       GET: show the calendar template
+    '''
+    id = current_user.get_id()
+
+    # Retrieve all messages of user <id>
+    sent_messages, received_messages, _, _ = MessageManager.get_all_messages(id)
+
+    try:
+        for message in sent_messages:
+            recipient = UserManager.get_user_by_id(message.recipient_id)
+            message.recipient['first_name'], message.recipient['last_name'] = recipient.first_name, recipient.last_name
+        for message in received_messages:
+            sender = UserManager.get_user_by_id(message.sender_id)
+            message.sender['first_name'], message.sender['last_name'] = sender.first_name, sender.last_name
+    except:
+        fake_name = 'Undefined'
+        for message in sent_messages: message.recipient['first_name'] = message.recipient['last_name'] = fake_name
+        for message in received_messages: message.sender['first_name'] = message.sender['last_name'] = fake_name
+
+
+    sent_messages= [
+        {
+            'time': str(message.delivery_date),
+            'cls': 'bg-orange-alt',
+            'desc': f'To {message.recipient["first_name"]} {message.recipient["last_name"]}',
+            'msg_id': message.id
+        } for message in sent_messages
+    ]
+
+    received_messages = [
+        {
+            'time': str(message.delivery_date),
+            'cls': 'bg-sky-blue-alt',
+            'desc': f'From {message.sender["first_name"]} {message.sender["last_name"]}',
+            'msg_id': message.id
+        } for message in received_messages
+    ]
+
+    return render_template(
+        'calendar.html',
+        data=json.dumps(sent_messages + received_messages),
+    )
+
+@messages.route('/scheduled')
+@login_required
+def scheduled():
+    '''Display the list of user's messages scheduled to be sent.
+
+       GET: show the list of messages
+    '''
+    # Retrieve user <id>
+    id = current_user.get_id()
+    _, _, _, scheduled_messages = MessageManager.get_all_messages(id)
+
+    try:
+        for message in scheduled_messages:
+            recipient = UserManager.get_user_by_id(message.recipient_id)
+            message.recipient['first_name'], message.recipient['last_name'] = recipient.first_name, recipient.last_name
+    except:
+        fake_name = 'Undefined'
+        for message in scheduled_messages: message.recipient['first_name'] = message.recipient['last_name'] = fake_name
+
+
+    return render_template('schedule.html', scheduled_messages=scheduled_messages)

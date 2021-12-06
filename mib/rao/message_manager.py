@@ -72,7 +72,8 @@ class MessageManager:
                 sent = [Message(**args) for args in json_payload['sent']]
                 received = [Message(**args) for args in json_payload['received']]
                 drafts = [Message(**args) for args in json_payload['drafts']]
-                return sent, received, drafts
+                scheduled = [Message(**args) for args in json_payload['scheduled']]
+                return sent, received, drafts, scheduled
 
             elif response.status_code == 404:
                 return abort(404)    
