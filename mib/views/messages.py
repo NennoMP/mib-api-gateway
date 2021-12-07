@@ -10,6 +10,7 @@ from .utils import get_argument
 from mib.forms.message import MessageForm
 from mib.rao.user_manager import UserManager
 from mib.rao.message_manager import MessageManager
+from mib.rao.blacklist_manager import BlacklistManager
 
 
 messages = Blueprint('messages', __name__)
@@ -26,18 +27,20 @@ allowed_attrs = {'*': ['class','style','color'],
 
 
 @messages.route('/message/<int:message_id>', methods=['GET', 'DELETE'])
+@login_required
 def message(message_id):
     '''Allows the user to read or delete a specific message by id.
 
        GET: display the content of a specific message by id (censored if language_filter is ON)
        DELETE: TODO
     '''
+    bonus = UserManager.get_bonus(current_user.get_id())
     if request.method == 'GET':
-
-        # TODO: try except
-        _message = MessageManager.get_message_by_id(current_user.get_id(), message_id)
-        bonus = UserManager.get_profile_by_id(current_user.get_id()).bonus
-
+        try: 
+            _message = MessageManager.get_message_by_id(current_user.get_id(), message_id)
+        except RuntimeError as e:
+            message='ERROR contacting message microservice'
+            return render_template('error.html',error=message)
         # Get sender and recipient first and last names.
         try:
             sender = UserManager.get_profile_by_id(_message.sender_id)
@@ -51,8 +54,14 @@ def message(message_id):
         return render_template('message.html', bonus=bonus, message=_message)
     
     # DELETE
-    # TODO: check user bonus > 0
-    MessageManager.delete_message_by_id(current_user.get_id(), message_id)
+    if bonus > 0:
+        try:
+            MessageManager.delete_message_by_id(current_user.get_id(), message_id)
+            bonus-=1
+            UserManager.set_bonus(current_user.get_id(),bonus)  
+        except:
+            message='Error in deleting the message'
+            return render_template('error.html',error=message)   
     return redirect("/mailbox")
 
 
@@ -92,7 +101,7 @@ def mailbox():
 
 
 @messages.route('/create_message', methods=['GET', 'POST'])
-#@login_required
+@login_required
 def create_message():
     '''Manage the creation, reply, and the forward of messages and drafts.
        GET: Creates the form for editing/writing a message.
@@ -141,11 +150,10 @@ def create_message():
 
             # Send.
             else:
-                #TODO: get from blacklist blocked user list per il check
+                blocked_users = BlacklistManager.get_blocked_users(user_id)['blocked_users']
                 for recipient in form.users_list.data:
-                    #if is_blocked(recipient):
-                    #    continue
-                
+                    if recipient in blocked_users:
+                        continue
                     if form.message_id_hidden.data > 0:
                         updated_message = {
                             'text': clean_text,
