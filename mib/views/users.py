@@ -206,18 +206,20 @@ def _users():
         return redirect(url_for('users._users'))
 
 
-@users.route('/reported_users/', methods=['GET', 'POST'])
+@users.route('/moderation/', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def reported_users():
-    '''Manage the list of reported users
+def moderation():
+    '''Manage the list of reported and banned users
 
-        GET: show the list of reported users with all possible actions: 
+        GET: show the list of reported and banned users with all possible actions: 
                 - reject
                 - ban
+                - unban
 
         POST: if <action_todo> = <Reject>: reject the report
               if <action_todo> = <Ban>: ban the reported user
+              if <action_todo> = <Unban>: unban the banned user
     '''
     if request.method == 'GET':
         users = UserManager.get_users_list()
@@ -225,7 +227,7 @@ def reported_users():
         reported_users = [user for user in users if user.is_reported]
         banned_users = [user for user in users if user.is_banned]
 
-        return render_template('reported_users.html', reported_users=reported_users, banned_users=banned_users)
+        return render_template('moderation.html', reported_users=reported_users, banned_users=banned_users)
 
     # POST
     # Retrieve action and target user email
@@ -238,10 +240,10 @@ def reported_users():
         if response.status_code == 202:
             # Successfull: reported
             flash(json_payload['message'])
-            return redirect(url_for('users.reported_users'))
+            return redirect(url_for('users.moderation'))
         else:
             flash('Error while applying action to the user')
-            return redirect(url_for('users.reported_users'))
+            return redirect(url_for('users.moderation'))
 
 
 @users.route('/unregister_user/', methods=['GET', 'POST'])
