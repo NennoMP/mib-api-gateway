@@ -122,10 +122,13 @@ def profile():
         if action == "Upload":
             file = form.data['profile_pic']
             format, file = image_to_base64(file)
-            response = UserManager.update_profile_pic(current_user.id, format, file)
-            if response.status_code == 202:
-                # Successfull: profile picture updated
-                flash('Edited profile picture')
+            if format is None or file is None:
+                flash('Error while updating the profile picture, make sure the file is an image')
+            else:
+                response = UserManager.update_profile_pic(current_user.id, format, file)
+                if response.status_code == 202:
+                    # Successfull: profile picture updated
+                    flash('Edited profile picture')
         # Update profile info
         elif action == 'Save':
             email = form.data['email']

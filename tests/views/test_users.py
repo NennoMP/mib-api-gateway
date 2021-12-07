@@ -109,17 +109,13 @@ class TestUser(ViewTest):
     @patch('mib.rao.user_manager.requests.post')
     def test_post_profile(self, mock_post):
 
-        # Upload profile picture
+        # Upload profile picture error
         data = {
             'action': 'Upload',
             'profile_pic': TEST_PATH_FILE
         }
         mock_post.return_value = Mock(
-            status_code=202,
-            json=lambda: {
-                'status': 'success',
-                'message': 'Profile picture updated'
-            }
+            status_code=404,
         )
         response = self.client.post(
             f'{self.BASE_URL}/profile/', 
