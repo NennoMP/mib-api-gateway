@@ -183,15 +183,15 @@ paths:
         default:
           description: Error while applying the action, reloads the page with an error message
 
-  /reported_users/:
+  /moderation/:
     get:
       tags: [ User ]
-      summary: This method retrieves the reported users list, only for admins
+      summary: This method retrieves the reported and banned users list, only for admins
       responses:
         200:
-          description: Return reported users list
+          description: Return reported and banned users list
         default:
-          description: An error occured while retrieving the list
+          description: An error occured while retrieving the lists
     post:
       summary: This method allows the admin to apply moderation actions, reject and (un)ban
       tags: [ Users ]

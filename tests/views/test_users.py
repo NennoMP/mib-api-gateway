@@ -328,7 +328,7 @@ class TestUser(ViewTest):
                 }
         )
         response = self.client.get(
-            f'{self.BASE_URL}/reported_users/',
+            f'{self.BASE_URL}/moderation/',
         )
 
         assert response is not None
@@ -349,7 +349,7 @@ class TestUser(ViewTest):
             }
         )
         response = self.client.post(
-            f'{self.BASE_URL}/reported_users/',
+            f'{self.BASE_URL}/moderation/',
             data=data
         )
         assert response is not None
@@ -368,7 +368,7 @@ class TestUser(ViewTest):
             }
         )
         response = self.client.post(
-            f'{self.BASE_URL}/reported_users/',
+            f'{self.BASE_URL}/moderation/',
             data=data
         )
         assert response is not None
@@ -383,7 +383,7 @@ class TestUser(ViewTest):
             status_code=404
         )
         response = self.client.post(
-            f'{self.BASE_URL}/reported_users/',
+            f'{self.BASE_URL}/moderation/',
             data=data
         )
 
@@ -402,7 +402,7 @@ class TestUser(ViewTest):
             status_code=404
         )
         response = self.client.post(
-            f'{self.BASE_URL}/reported_users/',
+            f'{self.BASE_URL}/moderation/',
             data=data
         )
 
