@@ -30,11 +30,9 @@ class BlacklistManager:
         UserManager.get_user_by_id(target_id)
         UserManager.get_user_by_id(user_id)
 
-        payload = dict(blocking_id=user_id, blocked_id=target_id)
         try:
-            url = "%s/blacklist" % (cls.BLACKLIST_ENDPOINT)
+            url = "%s/blacklist/%s/%s" % (cls.BLACKLIST_ENDPOINT, target_id, user_id)
             response = requests.put(url,
-                                    json=payload,
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
@@ -60,11 +58,9 @@ class BlacklistManager:
             }
             return jsonify(response), 409
         
-        payload = dict(blocking_id=user_id, blocked_id=target_id)
         try:
-            url = "%s/blacklist" % (cls.BLACKLIST_ENDPOINT)
+            url = "%s/blacklist/%s/%s" % (cls.BLACKLIST_ENDPOINT, target_id, user_id)
             response = requests.post(url,
-                                    json=payload,
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)

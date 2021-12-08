@@ -8,7 +8,6 @@ from datetime import datetime
 
 
 class MessageManager: 
-
     MESSAGES_ENDPOINT = app.config['MESSAGES_MS_URL']
     REQUESTS_TIMEOUT_SECONDS = app.config['REQUESTS_TIMEOUT_SECONDS']
 
