@@ -1,7 +1,7 @@
 from unittest.mock import Mock, patch
 from faker import Faker
 from random import randint
-from werkzeug.exceptions import  HTTPException, NotFound, InternalServerError
+from werkzeug.exceptions import NotFound, InternalServerError
 import requests
 
 
