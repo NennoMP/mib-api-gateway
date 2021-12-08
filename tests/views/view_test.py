@@ -62,3 +62,39 @@ class ViewTest(unittest.TestCase):
         }
 
         return message    
+
+    def generate_draft_message(self):
+        """Generates a random message, depending on the type
+        Returns:
+            (dict): a dictionary with the message's data
+        """
+
+        message = {
+            'sender_id' : randint(0,9999),
+            'recipient_id' : randint(0,9999),
+            'text' : 'Mock',
+            'delivery_date' : '2100-07-07T00:00:00Z',
+            'is_draft' : True,
+            'is_delivered' : False,
+            'is_read' : False
+        }
+
+        return message 
+
+    def generate_delivered_message(self):
+        """Generates a random message, depending on the type
+        Returns:
+            (dict): a dictionary with the message's data
+        """
+
+        message = {
+            'sender_id' : randint(0,9999),
+            'recipient_id' : randint(0,9999),
+            'text' : 'Mock',
+            'delivery_date' : '2100-07-07T00:00:00Z',
+            'is_draft' : False,
+            'is_delivered' : True,
+            'is_read' : False
+        }
+
+        return message    

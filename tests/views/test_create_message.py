@@ -1,19 +1,20 @@
 from random import choice, randint
 
+from flask import json
 from unittest.mock import Mock, patch
 from flask.helpers import send_file
 from .view_test import ViewTest
 from faker import Faker
 
 
-class TestMessage(ViewTest):
+class TestCreateMessage(ViewTest):
     faker = Faker('it_IT')
 
     BASE_URl = 'http://localhost'
 
     @classmethod
     def setUpClass(cls):
-        super(TestMessage, cls).setUpClass()
+        super(TestCreateMessage, cls).setUpClass()
         
 
     def generate_user_json(self):
@@ -33,326 +34,309 @@ class TestMessage(ViewTest):
             'has_language_filter': False
         }
 
-
+   
     @patch('requests.get')
-    def test_read_message(self, fake_get):
+    def test_edit_draft_message(self, fake_get):
         self.login()
 
         fake_responses = []
         fake_get.side_effect = fake_responses
 
-        # Bonus GET request
+        # Users list GET request 
         fake_responses.append(
             Mock(
                 status_code=200,
                 json=lambda: {
-                    'bonus': 666
+                    'users_list': []
                 }
             )
         )
 
         # Message GET request
-        message = self.generate_message()
         fake_responses.append(
             Mock(
                 status_code=200,
-                json=lambda: message
+                json=lambda: self.generate_draft_message()
             )
         )
-
-        test_user = self.generate_user_json()
-
-        # Sender GET request
-        message = self.generate_message()
-        fake_responses.append(
-            Mock(
-                status_code=200,
-                json=lambda: test_user
-            )
-        )
-
-        # Recipient GET request
-        message = self.generate_message()
-        fake_responses.append(
-            Mock(
-                status_code=200,
-                json=lambda: test_user
-            )
-        )
-
-        message_id = 1
+        
         response = self.client.get(
-            f'{self.BASE_URL}/message/{message_id}'
+            f'{self.BASE_URL}/create_message?draft_id=1'
         )
         assert response.status_code == 200
 
     @patch('requests.get')
-    def test_read_message_user_down(self, fake_get):
+    def test_edit_draft_message_message_down(self, fake_get):
         self.login()
 
         fake_responses = []
         fake_get.side_effect = fake_responses
 
-        # Bonus GET request
+        # Users list GET request 
         fake_responses.append(
             Mock(
                 status_code=200,
                 json=lambda: {
-                    'bonus': 666
+                    'users_list': []
+                }
+            )
+        )
+        
+        response = self.client.get(
+            f'{self.BASE_URL}/create_message?draft_id=1'
+        )
+        assert response.status_code == 403
+
+    @patch('requests.get')
+    def test_edit_not_draft_message(self, fake_get):
+        self.login()
+
+        fake_responses = []
+        fake_get.side_effect = fake_responses
+
+        # Users list GET request 
+        fake_responses.append(
+            Mock(
+                status_code=200,
+                json=lambda: {
+                    'users_list': []
                 }
             )
         )
 
         # Message GET request
-        message = self.generate_message()
         fake_responses.append(
             Mock(
                 status_code=200,
-                json=lambda: message
+                json=lambda: self.generate_message()
             )
         )
-
-        message_id = 1
+        
         response = self.client.get(
-            f'{self.BASE_URL}/message/{message_id}'
+            f'{self.BASE_URL}/create_message?draft_id=1'
         )
-        assert response.status_code == 200
+        assert response.status_code == 403
+
 
     @patch('requests.get')
-    def test_delete_message(self, fake_get):
+    def test_edit_forw_message(self, fake_get):
         self.login()
 
         fake_responses = []
         fake_get.side_effect = fake_responses
 
-        # Bonus GET request
+        # Users list GET request 
         fake_responses.append(
             Mock(
                 status_code=200,
                 json=lambda: {
-                    'bonus': 666
+                    'users_list': []
                 }
             )
         )
 
-        # Message DELETE request
+        # Message GET request
         fake_responses.append(
             Mock(
                 status_code=200,
+                json=lambda: self.generate_delivered_message()
             )
         )
-
-        message_id = 1
-        response = self.client.delete(
-            f'{self.BASE_URL}/message/{message_id}'
+        
+        response = self.client.get(
+            f'{self.BASE_URL}/create_message?forw_id=1'
         )
         assert response.status_code == 200
 
     @patch('requests.get')
-    def test_mailbox(self, fake_get):
+    def test_edit_forw_message_message_down(self, fake_get):
         self.login()
 
         fake_responses = []
         fake_get.side_effect = fake_responses
 
-        # All messages GET request
+        # Users list GET request 
         fake_responses.append(
             Mock(
                 status_code=200,
                 json=lambda: {
-                    'sent': [],
-                    'received': [],
-                    'drafts': [],
-                    'scheduled': []
+                    'users_list': []
                 }
             )
         )
-
+        
         response = self.client.get(
-            f'{self.BASE_URL}/mailbox'
+            f'{self.BASE_URL}/create_message?forw_id=1'
         )
-        assert response.status_code == 200
+        assert response.status_code == 403
 
     @patch('requests.get')
-    def test_mailbox_user_down(self, fake_get):
+    def test_edit_not_forw_message(self, fake_get):
         self.login()
 
         fake_responses = []
         fake_get.side_effect = fake_responses
 
-        # All messages GET request
+        # Users list GET request 
         fake_responses.append(
             Mock(
                 status_code=200,
                 json=lambda: {
-                    'sent': [self.generate_message()],
-                    'received': [self.generate_message()],
-                    'drafts': [],
-                    'scheduled': []
+                    'users_list': []
                 }
             )
         )
 
-        test_user = self.generate_user_json()
-
-        # User GET request 
+        # Message GET request
         fake_responses.append(
             Mock(
                 status_code=200,
-                json=lambda: test_user
+                json=lambda: self.generate_message()
             )
         )
-
+        
         response = self.client.get(
-            f'{self.BASE_URL}/mailbox'
+            f'{self.BASE_URL}/create_message?forw_id=1'
         )
-        assert response.status_code == 200
-
-    def test_mailbox_message_down(self):
-        self.login()
-
-        response = self.client.get(
-            f'{self.BASE_URL}/mailbox'
-        )
-        assert response.status_code == 200
+        assert response.status_code == 403
 
 
     @patch('requests.get')
-    def test_calendar(self, fake_get):
+    def test_edit_reply_message(self, fake_get):
         self.login()
 
         fake_responses = []
         fake_get.side_effect = fake_responses
 
-        # All messages GET request
+        # Users list GET request 
         fake_responses.append(
             Mock(
                 status_code=200,
                 json=lambda: {
-                    'sent': [],
-                    'received': [],
-                    'drafts': [],
-                    'scheduled': []
+                    'users_list': []
                 }
             )
         )
 
+        # Message GET request
+        fake_responses.append(
+            Mock(
+                status_code=200,
+                json=lambda: self.generate_delivered_message()
+            )
+        )
+        
         response = self.client.get(
-            f'{self.BASE_URL}/calendar'
+            f'{self.BASE_URL}/create_message?reply_id=1'
         )
         assert response.status_code == 200
 
     @patch('requests.get')
-    def test_calendar_user_down(self, fake_get):
+    def test_edit_reply_message_message_down(self, fake_get):
         self.login()
 
         fake_responses = []
         fake_get.side_effect = fake_responses
 
-        # All messages GET request
+        # Users list GET request 
         fake_responses.append(
             Mock(
                 status_code=200,
                 json=lambda: {
-                    'sent': [self.generate_message()],
-                    'received': [self.generate_message()],
-                    'drafts': [],
-                    'scheduled': []
+                    'users_list': []
                 }
             )
         )
-
-        test_user = self.generate_user_json()
-
-        # User GET request 
-        fake_responses.append(
-            Mock(
-                status_code=200,
-                json=lambda: test_user
-            )
-        )
-
+        
         response = self.client.get(
-            f'{self.BASE_URL}/calendar'
+            f'{self.BASE_URL}/create_message?reply_id=1'
         )
-        assert response.status_code == 200
-
-    def test_calendar_message_down(self):
-        self.login()
-
-        response = self.client.get(
-            f'{self.BASE_URL}/calendar'
-        )
-        assert response.status_code == 200
-
+        assert response.status_code == 403
 
     @patch('requests.get')
-    def test_scheduled(self, fake_get):
+    def test_edit_not_reply_message(self, fake_get):
         self.login()
 
         fake_responses = []
         fake_get.side_effect = fake_responses
 
-        # All messages GET request
+        # Users list GET request 
         fake_responses.append(
             Mock(
                 status_code=200,
                 json=lambda: {
-                    'sent': [],
-                    'received': [],
-                    'drafts': [],
-                    'scheduled': [self.generate_message()]
+                    'users_list': []
                 }
             )
         )
 
-        test_user = self.generate_user_json()
-
-        # User GET request 
+        # Message GET request
         fake_responses.append(
             Mock(
                 status_code=200,
-                json=lambda: test_user
+                json=lambda: self.generate_message()
             )
         )
-
+        
         response = self.client.get(
-            f'{self.BASE_URL}/scheduled'
+            f'{self.BASE_URL}/create_message?reply_id=1'
         )
-        assert response.status_code == 200
+        assert response.status_code == 403
+
+
+    def test_save_new_message(self):
+        self.login()
+
+        message = {
+            'text_area': 'text',
+            'delivery_date': '2022-10-10T08:00',
+            'save_button':'Save'
+        }
+        
+        response = self.client.post(
+            f'{self.BASE_URL}/create_message',
+            data=json.dumps(message), 
+            content_type='application/json'
+        )
+        assert response.status_code == 302
+
 
     @patch('requests.get')
-    def test_scheduled_user_down(self, fake_get):
+    def test_send_new_message(self, fake_get):
         self.login()
+
+        message = {
+            'text_area': 'text',
+            'delivery_date': '2022-10-10T08:00',
+            'users_list': ['2']
+        }
 
         fake_responses = []
         fake_get.side_effect = fake_responses
 
-        # All messages GET request
+        # User GET request
+        fake_responses.append(
+            Mock(
+                status_code=200,
+                json=lambda: self.generate_user()
+            )
+        )
+
+        # Blacklist GET request
         fake_responses.append(
             Mock(
                 status_code=200,
                 json=lambda: {
-                    'sent': [],
-                    'received': [],
-                    'drafts': [],
-                    'scheduled': [self.generate_message()]
-                }
+                    'blocked_users' : []}
             )
         )
-
-        response = self.client.get(
-            f'{self.BASE_URL}/scheduled'
+        
+        response = self.client.post(
+            f'{self.BASE_URL}/create_message',
+            data=json.dumps(message), 
+            content_type='application/json'
         )
-        assert response.status_code == 200
-
-    def test_scheduled_message_down(self):
-        self.login()
-
-        response = self.client.get(
-            f'{self.BASE_URL}/scheduled'
-        )
-        assert response.status_code == 200
+        assert response.status_code == 302
 
 
     @patch('mib.rao.user_manager.requests.post')
