@@ -22,6 +22,7 @@ class MessageManager:
             response = requests.get(f'{cls.MESSAGES_ENDPOINT}/message/{user_id}/{message_id}',
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
+
             if response.status_code == 200:
                 json_payload['delivery_date'] = datetime.strptime(json_payload['delivery_date'], '%Y-%m-%dT%H:%M:%SZ')
                 message = Message(**json_payload)

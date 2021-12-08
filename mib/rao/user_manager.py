@@ -302,7 +302,6 @@ class UserManager:
             return abort(500)
         
         json_payload = response.json()
-        #TODO: check status code
         return json_payload['bonus']
         
     @classmethod
