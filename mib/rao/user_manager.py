@@ -273,6 +273,8 @@ class UserManager:
         :return: User obj list
         """
 
+        users_list = []
+
         try:
             response = requests.get("%s/users/" % (cls.USERS_ENDPOINT),
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
@@ -324,8 +326,7 @@ class UserManager:
 
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return abort(500)
-            
-        
+
         return response
 
 
@@ -390,4 +391,3 @@ class UserManager:
             return abort(500)
 
         return response
-
