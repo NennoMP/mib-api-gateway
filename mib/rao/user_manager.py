@@ -14,7 +14,6 @@ from mib.auth.user import User
 
 class UserManager:
     USERS_ENDPOINT = app.config['USERS_MS_URL']
-    BLACKLIST_ENDPOINT = app.config['BLACKLIST_MS_URL']
     REQUESTS_TIMEOUT_SECONDS = app.config['REQUESTS_TIMEOUT_SECONDS']
 
     @classmethod
