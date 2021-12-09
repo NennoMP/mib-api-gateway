@@ -6,6 +6,9 @@ from mib import app
 from mib.models.message import Message
 from datetime import datetime
 
+import os
+env = os.getenv('FLASK_ENV', 'None')
+
 
 class MessageManager: 
     MESSAGES_ENDPOINT = app.config['MESSAGES_MS_URL']
@@ -22,10 +25,11 @@ class MessageManager:
                                     timeout=cls.REQUESTS_TIMEOUT_SECONDS)
             json_payload = response.json()
 
-            if json_payload['delivery_date'] is None:
-                response = requests.get(f'{cls.MESSAGES_ENDPOINT}/message/{user_id}/{message_id}',
-                                    timeout=cls.REQUESTS_TIMEOUT_SECONDS)
-                json_payload = response.json()
+            if env != 'testing':
+                if json_payload['delivery_date'] is None:
+                    response = requests.get(f'{cls.MESSAGES_ENDPOINT}/message/{user_id}/{message_id}',
+                                        timeout=cls.REQUESTS_TIMEOUT_SECONDS)
+                    json_payload = response.json()
 
             if response.status_code == 200:
                 json_payload['delivery_date'] = datetime.strptime(json_payload['delivery_date'], '%Y-%m-%dT%H:%M:%SZ')
