@@ -1,6 +1,7 @@
 # Message In a Bottle - API Gateway
 
-![CircleCI](https://circleci.com/gh/NennoMP/mib-api-gateway.svg?style=svg)
+
+[![CircleCI](https://circleci.com/gh/NennoMP/mib-api-gateway.svg?style=svg)](https://app.circleci.com/pipelines/github/NennoMP/mib-api-gateway)
 
 This is the source code of Message in a Bottle application, self project of *Advanced Software Engineering* course,
 University of Pisa.
