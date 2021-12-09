@@ -9,18 +9,20 @@ University of Pisa.
 
 ## Team info
 
-- The *squad id* is **<SQUAD_ID>**
-- The *team leader* is <team_leader>
+- The *squad id* is **5**
+- The *team leader* is *Laura Norato*
 
 #### Members
 
-| Name and Surname | Email |
-| ---------------- | ----- |
-|                  |       |
-|                  |       |
-|                  |       |
-|                  |       |
-|                  |       |
+Mark with *bold* the person(s) that has developed this microservice.
+
+|Name and Surname    | Email                         |
+|--------------------|-------------------------------|
+|*Laura Norato*      |l.norato@studenti.unipi.it     |
+|*Emanuele Albertosi*|20783727@studenti.unipi.it     |
+|*Michele Zoncheddu* |m.zoncheddu@studenti.unipi.it  |
+|*Alessio Russo*     |a.russo65@studenti.unipi.it    |
+|*Matteo Pinna*     |m.pinna10@studenti.unipi.it    |
 
 
 ## Instructions
