@@ -35,13 +35,14 @@ def message(message_id):
        DELETE:
     '''
     bonus = UserManager.get_bonus(current_user.get_id())
-    if request.method == 'GET':
-        try: 
-            _message = MessageManager.get_message_by_id(current_user.get_id(), message_id)
-        except RuntimeError as e:
-            message='ERROR contacting message microservice'
-            return render_template('error.html',error=message)
 
+    try: 
+        _message = MessageManager.get_message_by_id(current_user.get_id(), message_id)
+    except RuntimeError as e:
+        message='ERROR contacting message microservice'
+        return render_template('error.html', error=message)
+
+    if request.method == 'GET':
         # Get sender and recipient first and last names.
         try:
             sender = UserManager.get_profile_by_id(_message.sender_id)
@@ -56,14 +57,14 @@ def message(message_id):
         return render_template('message.html', bonus=bonus, message=_message)
     
     # DELETE
-    if bonus > 0:
-        try:
-            MessageManager.delete_message_by_id(current_user.get_id(), message_id)
+    try:
+        MessageManager.delete_message_by_id(current_user.get_id(), message_id)
+        if not _message.is_draft and not _message.is_delivered and bonus > 0:
             bonus -= 1
             UserManager.set_bonus(current_user.get_id(), bonus)
-        except:
-            message = 'Error in deleting the message'
-            return render_template('error.html', error=message)
+    except:
+        message = 'Error in deleting the message'
+        return render_template('error.html', error=message)
 
     return redirect("/mailbox")
 
@@ -265,10 +266,10 @@ def calendar():
 
     try:
         for message in sent_messages:
-            recipient = UserManager.get_user_by_id(message.recipient_id)
+            recipient = UserManager.get_profile_by_id(message.recipient_id)
             message.recipient['first_name'], message.recipient['last_name'] = recipient.first_name, recipient.last_name
         for message in received_messages:
-            sender = UserManager.get_user_by_id(message.sender_id)
+            sender = UserManager.get_profile_by_id(message.sender_id)
             message.sender['first_name'], message.sender['last_name'] = sender.first_name, sender.last_name
     except:
         fake_name = 'Undefined'
@@ -315,7 +316,7 @@ def scheduled():
 
     try:
         for message in scheduled_messages:
-            recipient = UserManager.get_user_by_id(message.recipient_id)
+            recipient = UserManager.get_profile_by_id(message.recipient_id)
             message.recipient['first_name'], message.recipient['last_name'] = recipient.first_name, recipient.last_name
     except:
         fake_name = 'Undefined'

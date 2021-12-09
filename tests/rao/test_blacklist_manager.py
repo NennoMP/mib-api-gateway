@@ -63,7 +63,6 @@ class TestBlacklistManager(RaoTest):
         # Test Timeout response
         fake_responses.append(requests.exceptions.Timeout())
 
-
         with self.assertRaises(InternalServerError):
             self.blacklist_manager.block_user(blocked_user['id'], blocking_user['id'])
 

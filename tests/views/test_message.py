@@ -135,6 +135,15 @@ class TestMessage(ViewTest):
             )
         )
 
+        # Message GET request
+        message = self.generate_message()
+        fake_responses.append(
+            Mock(
+                status_code=200,
+                json=lambda: message
+            )
+        )
+
         # Message DELETE request
         fake_responses.append(
             Mock(
