@@ -102,9 +102,10 @@ for example gunicorn and psycopg2.
 **IMPORTANT:** the Docker image uses the only the production requirements.
 ### Run tests
 
-To run all the tests, execute the following command:
+In order to test the application we first need to set the enviroment and then to run the tests. Execute the following commands:
 
-`python -m pytest`
+- `export FLASK_ENV=testing`
+- `python -m pytest`
 
 You can also specify one or more specific test files, in order to run only those specific tests.
 In case you also want to see the overall coverage of the tests, execute the following command:
