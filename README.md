@@ -2,6 +2,7 @@
 
 
 [![CircleCI](https://circleci.com/gh/NennoMP/mib-api-gateway.svg?style=svg)](https://app.circleci.com/pipelines/github/NennoMP/mib-api-gateway)
+[![codecov](https://codecov.io/gh/NennoMP/mib-api-gateway/branch/main/graph/badge.svg?token=APB8A4ZRIF)](https://codecov.io/gh/NennoMP/mib-api-gateway)
 
 This is the source code of Message in a Bottle application, self project of *Advanced Software Engineering* course,
 University of Pisa.
