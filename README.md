@@ -4,13 +4,8 @@
 [![CircleCI](https://circleci.com/gh/NennoMP/mib-api-gateway.svg?style=svg)](https://app.circleci.com/pipelines/github/NennoMP/mib-api-gateway)
 [![codecov](https://codecov.io/gh/NennoMP/mib-api-gateway/branch/main/graph/badge.svg?token=APB8A4ZRIF)](https://codecov.io/gh/NennoMP/mib-api-gateway)
 
-This is the source code of Message in a Bottle application, self project of *Advanced Software Engineering* course,
+This is the source code of My Message in a Bottle API-gateway microservice, project of **Advanced Software Engineering** course of the MSc in Computer Science,
 University of Pisa.
-
-## Team info
-
-- The *squad id* is **5**
-- The *team leader* is *Laura Norato*
 
 #### Members
 
@@ -22,39 +17,13 @@ Mark with *bold* the person(s) that has developed this microservice.
 |*Emanuele Albertosi*|20783727@studenti.unipi.it     |
 |*Michele Zoncheddu* |m.zoncheddu@studenti.unipi.it  |
 |*Alessio Russo*     |a.russo65@studenti.unipi.it    |
-|*Matteo Pinna*     |m.pinna10@studenti.unipi.it    |
+|*Matteo Pinna*      |m.pinna10@studenti.unipi.it    |
 
+
+## Overview
+This microservice implements the API-gateway logic.
 
 ## Instructions
-
-### Initialisation
-
-To setup the project initially you have to run these commands
-inside the project's root.
-
-`virtualenv -p python3 venv`
-
-`source venv/bin/activate`
-
-`pip install -r requirements.dev.txt`
-
-### Run the project
-
-To run the project you have to setup the flask environment,
-you can do it by executing the following command:
-
-`export FLASK_ENV=<environment-name>`
-
-and now you can run the application
-
-`flask run`
-
-**WARNING**: the static contents are inside the directory nginx/static,
-so if you want to run application without nginx you have to copy
-the static directory inside mib folder.
-
-#### Application Environments
-
 The available environments are:
 
 - debug
@@ -62,17 +31,24 @@ The available environments are:
 - testing
 - production
 
-If you want to run the application you have to startup the redis
-instance, using the command:
+If you want to run the appliction with development environment, or you are developing the application and you want to have the debug tools, you can start the application locally (without `docker-compose`) by executing `bash run.sh`.
 
-```shell script
-cp env_file_example env_file
-export FLASK_ENV=development
-flask run
-```
+**Note:** if you use `docker-compose up` you are going to startup a production ready microservice, hence postgres will be used as default database and gunicorn will serve your application.
 
-#### Python dotenv
+You can run the entire application by following the instructions on the main repository mib-main. However, if you would like to separately run this microservice take a look at the steps below.
 
+### Initialization
+First, you need to setup create a virtual environment and to install all requirements. Run these commands inside **mib-api-gateway** root:
+
+1. Create a virtual environment with `virtualenv venv`.
+3. Activate it with `source venv/bin/activate` or `source venv/scripts/activate`.
+4. Install all requirements needed with `pip install -r requirements.dev.txt`.
+
+**WARNING**: the static contents are inside the directory nginx/static,
+so if you want to run application without nginx you have to copy
+the static directory inside mib folder.
+
+### Python dotenv
 Each time you start a new terminal session, you have to
 set up all the environment variables that projects requires.
 When the variables number increases, the procedures needed to run
@@ -100,21 +76,6 @@ for example pytest.
 for example gunicorn and psycopg2.
 
 **IMPORTANT:** the Docker image uses the only the production requirements.
-### Run tests
-
-In order to test the application we first need to set the enviroment and then to run the tests. Execute the following commands:
-
-- `export FLASK_ENV=testing`
-- `python -m pytest`
-
-You can also specify one or more specific test files, in order to run only those specific tests.
-In case you also want to see the overall coverage of the tests, execute the following command:
-
-`python -m pytest --cov=mib`
-
-In order to know what are the lines of codes which are not covered by the tests, execute the command:
-
-`python -m pytest --cov-report term-missing`
 
 ### Nginx and Gunicorn
 
@@ -145,6 +106,25 @@ The complete command to run this service with docker is the following:
 
 ### Nginx orchestrator
 
-We have created a specific documentation file for 
-[nginx-orchestrator](./nginx-orchestrator/README.md)
+We have created a specific documentation file for [nginx-orchestrator](./nginx-orchestrator/README.md)
 
+### Run
+You can now run the microservice running the following commands:
+
+1. Run the microservice with `bash run.sh` (environment is automatically set to development).
+
+### Testing
+In order to execute the tests you need, if you haven't already, to install the requirements by following the steps mentioned above. When you're done, you can run the tests:
+
+1. Set Flask environment to testing with `export FLASK_ENV=testing`
+2. Run the tests with `pytest`
+
+The tests are set to file when the coverage is below 90%.
+
+You can also specify one or more specific test files, in order to run only those specific tests. In case you also want to see the overall coverage of the tests, execute the following command:
+
+`python -m pytest --cov=mib`
+
+In order to know what are the lines of codes which are not covered by the tests, execute the command:
+
+`python -m pytest --cov-report term-missing`
